@@ -3,12 +3,12 @@ import { log } from 'console';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { plainToInstance } from 'class-transformer';
-import { CardDTO } from 'src/card/DTO/card.type';
 import { CardFace } from 'src/card/models/card-face.model';
 import { Card } from 'src/card/models/card.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
+import { ScryfallDataDTO } from '../DTO/scryfall-data.dto';
 const fs = require('fs');
 
 @Injectable()
@@ -37,13 +37,9 @@ export class DBUpdateService {
         this.logger.log('Done truncating tables...');
 
         this.logger.log('Downloading set data from scryfall...');
-        const sets = await (
+        const setsJSONData = await (
           await firstValueFrom(this.http.get('https://api.scryfall.com/sets'))
         ).data.data;
-
-        this.logger.log('Inserting set data into database...');
-        await this.setModel.bulkCreate(sets, { logging: false, transaction: tx });
-        this.logger.log('Done inserting set data...');
 
         const bulkDataOptions = (
           await firstValueFrom(this.http.get('https://api.scryfall.com/bulk-data', {}))
@@ -52,44 +48,52 @@ export class DBUpdateService {
         let bulkData = bulkDataOptions.find((bdo) => bdo.type === bulkDataType);
 
         this.logger.log('Downloading card data from scryfall...');
-        /*
-        let defaultCardsJsonData = (await firstValueFrom(this.http.get(bulkData.download_uri, {})))
-          .data;
-          */
-        let openedFile = await fs.promises.open('cards.json', 'r');
-
-        this.logger.debug('Done downloading bulk card data...');
-        let defaultCardsJsonData = JSON.parse(await openedFile.readFile('utf8'));
+        const cardsJSONData = (await firstValueFrom(this.http.get(bulkData.download_uri, {}))).data;
         this.logger.log('Done downloading bulk card data...');
 
-        let dfo = plainToInstance(CardDTO, defaultCardsJsonData, {
-          excludeExtraneousValues: true,
-          exposeUnsetFields: true,
-          exposeDefaultValues: true,
-        }) as unknown as Card[];
-        log(dfo[0]);
+        this.logger.log('Validating data...');
+        let scryfallData = plainToInstance(
+          ScryfallDataDTO,
+          { cards: cardsJSONData, sets: setsJSONData },
+          {
+            excludeExtraneousValues: true,
+            exposeUnsetFields: true,
+            exposeDefaultValues: true,
+          },
+        );
 
-        let errors = await validate(dfo.slice(0, 10), {
+        let errors = await validate(scryfallData, {
           skipMissingProperties: false,
           whitelist: true,
         });
 
         if (errors.length > 0) {
-          //log(errors);
-          throw errors[0];
+          log(errors[0].children[0]);
+          log(errors[0].children[0].children[0]);
+          log(errors[0].children[0].children[0].value);
+          throw errors;
         }
 
+        this.logger.log('Done validating data...');
+
+        this.logger.log('Inserting set data into database...');
+        await this.setModel.bulkCreate(scryfallData.sets as any, {
+          logging: false,
+          transaction: tx,
+        });
+        this.logger.log('Done inserting set data...');
+
         this.logger.log('Inserting card data into database...');
-        await this.cardModel.bulkCreate(dfo, {
+        await this.cardModel.bulkCreate(scryfallData.cards as any, {
           logging: false,
           include: [{ model: CardFace, as: 'card_faces' }],
           transaction: tx,
         });
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error[0]);
       this.logger.error('Update Failed. Rolling back update...');
-      this.logger.error(error);
+      //this.logger.error(error);
     } finally {
       this.logger.log('Update complete');
       this.logger.log('--------------------------------------------------------------');

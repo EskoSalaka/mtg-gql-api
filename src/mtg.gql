@@ -284,7 +284,7 @@ type Card {
   scryfall_uri: URL!
   uri: URL!
   card_faces: [CardFace!]
-  cmc: Float!
+  cmc: Float
   color_identity: [Color!]!
   color_indicator: [Color!]
   colors: [Color!]

@@ -1,22 +1,23 @@
 import Language from '../types/language.type';
 import Layout from '../types/layout.type';
-import { CardFaceDTO } from './card-face.type';
+import { CardFaceDTO } from './card-face.dto';
 import Color from '../types/color.type';
-import { Expose, Type } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
+  IsDateString,
   IsDefined,
   IsEnum,
   IsNumber,
   IsOptional,
   IsString,
+  isURL,
   IsUrl,
   IsUUID,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { Optional } from '@nestjs/common';
-import { log } from 'console';
 
 export class CardDTO {
   //Core Card Fields
@@ -61,10 +62,11 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsNumber()
   cardmarket_id: number | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   object: string;
 
   @Expose()
@@ -73,6 +75,7 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   oracle_id: string | null = null;
 
   @Expose()
@@ -88,7 +91,7 @@ export class CardDTO {
   scryfall_uri: string;
 
   @Expose()
-  @IsDefined()
+  @IsUrl()
   uri: string;
 
   //Gameplay Fields
@@ -105,11 +108,12 @@ export class CardDTO {
   card_faces: CardFaceDTO[] = [];
 
   @Expose()
-  @IsDefined()
-  cmc: number;
+  @IsNumber()
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
+  cmc: number | null = null;
 
   @Expose()
-  @IsDefined()
   @IsEnum(Color, { each: true })
   color_identity: Color[];
 
@@ -125,6 +129,7 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   defense: string | null = null;
 
   @Expose()
@@ -133,6 +138,7 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   hand_modifier: string | null = null;
 
   @Expose()
@@ -145,22 +151,27 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   life_modifier: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   loyalty: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   mana_cost: string | null = null;
 
   @Expose()
   @IsDefined()
+  @IsString()
   name: string;
 
   @Expose()
   @IsOptional()
+  @IsString()
   oracle_text: string | null = null;
 
   @Expose()
@@ -169,27 +180,32 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   power: string | null = null;
 
   @Expose()
   @IsOptional()
-  produced_mana: string | null = null;
+  @IsString({ each: true })
+  produced_mana: string[] | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   reserved: boolean;
 
   @Expose()
   @IsOptional()
+  @IsString()
   toughness: string | null = null;
 
   @Expose()
-  @IsDefined()
-  type_line: string;
+  @IsOptional()
+  @IsString()
+  type_line: string | null = null;
 
   //Print Fields
   @Expose()
   @IsOptional()
+  @IsString()
   artist: string | null = null;
 
   @Expose()
@@ -199,30 +215,33 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
-  attraction_lights: string | null = null;
+  @IsNumber({}, { each: true })
+  attraction_lights: number[] | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   booster: boolean;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   border_color: string;
 
   @Expose()
-  @IsDefined()
-  card_back_id: string;
+  @IsString()
+  @IsOptional()
+  card_back_id: string | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   collector_number: string;
 
   @Expose()
   @IsOptional()
+  @IsBoolean()
   content_warning: boolean | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   digital: boolean;
 
   @Expose()
@@ -232,10 +251,12 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   flavor_name: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   flavor_text: string | null = null;
 
   @Expose()
@@ -244,11 +265,11 @@ export class CardDTO {
   frame_effects: string[] | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   frame: string;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   full_art: boolean;
 
   @Expose()
@@ -257,11 +278,12 @@ export class CardDTO {
   games: string[] | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   highres_image: boolean;
 
   @Expose()
   @IsOptional()
+  @IsString()
   illustration_id: string | null = null;
 
   @Expose()
@@ -273,7 +295,7 @@ export class CardDTO {
   image_uris: object | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   oversized: boolean;
 
   @Expose()
@@ -282,18 +304,21 @@ export class CardDTO {
 
   @Expose()
   @IsOptional()
+  @IsString()
   printed_name: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   printed_text: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   printed_type_line: string | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   promo: boolean;
 
   @Expose()
@@ -306,7 +331,7 @@ export class CardDTO {
   purchase_uris: object | null = null;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   rarity: string;
 
   @Expose()
@@ -314,62 +339,65 @@ export class CardDTO {
   related_uris: object;
 
   @Expose()
-  @IsDefined()
+  @IsDateString()
   released_at: Date;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   reprint: boolean;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   scryfall_set_uri: string;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   set_name: string;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   set_search_uri: string;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   set_type: string;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   set_uri: string;
 
   @Expose({ name: 'set' })
   set_code: string;
 
   @Expose()
-  @IsDefined()
+  @IsString()
   set_id: string;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   story_spotlight: boolean;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   textless: boolean;
 
   @Expose()
-  @IsDefined()
+  @IsBoolean()
   variation: boolean;
 
   @Expose()
   @IsOptional()
+  @IsString()
   variation_of: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   security_stamp: string | null = null;
 
   @Expose()
   @IsOptional()
+  @IsString()
   watermark: string | null = null;
 
   /** 

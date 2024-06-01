@@ -103,8 +103,8 @@ export class Card extends Model<Card> {
   card_faces: CardFace[] | null;
 
   @Column(DataType.DECIMAL)
-  @Field()
-  cmc: number;
+  @Field({ nullable: true })
+  cmc: number | null;
 
   @Column(DataType.JSON)
   @Field(() => [Color])
@@ -182,7 +182,7 @@ export class Card extends Model<Card> {
 
   @Column(DataType.STRING)
   @Field({ nullable: true })
-  type_line: string;
+  type_line: string | null;
 
   //Print Fields
   @Column(DataType.STRING)
