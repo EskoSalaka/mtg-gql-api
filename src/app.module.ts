@@ -117,7 +117,19 @@ import { log } from 'console';
     SetModule,
   ],
   controllers: [],
-  providers: [SequelizeModule, Logger, SequelizeLoggerService],
+  providers: [
+    SequelizeModule,
+    Logger,
+    SequelizeLoggerService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidUnknownValues: true,
+      }),
+    },
+  ],
   exports: [SequelizeModule],
 })
 export class AppModule {}
