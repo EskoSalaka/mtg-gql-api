@@ -91,7 +91,7 @@ import { EnvironmentVariables, logLevels, validateEnvironment } from './environm
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: path.join(process.cwd(), 'src/mtg.gql'),
+      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
     }),
     ServerUtilsModule,
     HttpModule,
