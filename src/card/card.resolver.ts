@@ -24,12 +24,10 @@ export class CardResolver {
     let cardAttributes = fieldsList(context, { path: 'rows', skip: ['rows.card_faces'] });
     let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
 
-    let card = await this.cardModel.findByPk(id, {
+    return this.cardModel.findByPk(id, {
       include: [{ model: CardFace, attributes: cardFaceAttributes }],
       attributes: cardAttributes,
     });
-
-    return card;
   }
 
   @Query(() => CardPage)
