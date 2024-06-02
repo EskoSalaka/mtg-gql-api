@@ -9,7 +9,6 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { WhereQueryArgs } from 'src/common/types/defaultQueryArgs.type';
-import { plainToInstance } from 'class-transformer';
 import { InjectModel } from '@nestjs/sequelize';
 import { log } from 'console';
 import { CardFace } from 'src/card/models/card-face.model';
@@ -44,16 +43,15 @@ export class SetResolver {
     });
   }
 
-  @ResolveField()
+  @ResolveField(() => [Card])
   async cards(@Parent() parent: Set, @Info() context: ExecutionContextHost) {
-    let cardAttributes = fieldsList(context, { path: 'rows', skip: ['rows.card_faces'] });
-    let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
+    let cardAttributes = fieldsList(context, { skip: ['card_faces'] });
+    let cardFaceAttributes = fieldsList(context, { path: 'card_faces' });
 
     let set = await this.setModel.findByPk(parent.id, {
       include: [
         {
           model: Card,
-          as: 'Cards',
           attributes: cardAttributes,
           include: [
             {
