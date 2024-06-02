@@ -37,7 +37,7 @@ type CardImagery {
 }
 
 type CardFace {
-  id: Float!
+  id: String!
   card_id: UUID!
   artist: String
   artist_id: UUID
@@ -266,6 +266,91 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""An object describing the legality of a card across play formats."""
+type Legalities {
+  standard: Legality
+  future: Legality
+  historic: Legality
+  timeless: Legality
+  gladiator: Legality
+  pioneer: Legality
+  explorer: Legality
+  modern: Legality
+  legacy: Legality
+  pauper: Legality
+  vintage: Legality
+  penny: Legality
+  commander: Legality
+  oathbreaker: Legality
+  standardbrawl: Legality
+  brawl: Legality
+  alchemy: Legality
+  paupercommander: Legality
+  duel: Legality
+  oldschool: Legality
+  premodern: Legality
+  predh: Legality
+}
+
+"\n  An object describing the legality of a card across play formats. Possible legalities are legal, not_legal, restricted, and banned. \n  "
+enum Legality {
+  """Legal"""
+  legal
+
+  """Not Legal"""
+  not_legal
+
+  """Restricted"""
+  restricted
+
+  """Banned"""
+  banned
+}
+
+"""
+An object containing daily price information for this card, including usd, 
+  usd_foil, usd_etched, eur, eur_foil, eur_etched, and tix prices, as Decimals (strings). 
+"""
+type Prices {
+  usd: String
+  usd_foil: String
+  usd_etched: String
+  eur: String
+  eur_foil: String
+  eur_etched: String
+  tix: String
+}
+
+"""
+An object describing a related card.
+  
+  Cards that are closely related to other cards (because they call them by name, 
+  or generate a token, or meld, etc) have a all_parts property that contains 
+  Related Card objects. Those objects have the following properties:
+"""
+type RelatedCardInfo {
+  """The ID of the related card."""
+  id: String!
+
+  """A content type for this object, always related_card. """
+  object: String!
+
+  """
+  A field explaining what role this card plays in this relationship, 
+      one of token, meld_part, meld_result, or combo_piece. 
+  """
+  component: String!
+
+  """The name of the related card."""
+  name: String!
+
+  """The type line of the related card."""
+  type_line: String!
+
+  """The URI for this card on Scryfall API."""
+  uri: String!
+}
+
 type Card {
   id: UUID!
   lang: Language
@@ -283,6 +368,7 @@ type Card {
   rulings_uri: URL
   scryfall_uri: URL!
   uri: URL!
+  all_parts: [RelatedCardInfo!]
   card_faces: [CardFace!]
   cmc: Float
   color_identity: [Color!]!
@@ -292,7 +378,7 @@ type Card {
   edhrec_rank: Float
   hand_modifier: String
   keywords: [String!]!
-  legalities: JSON
+  legalities: Legalities
   life_modifier: String
   loyalty: String
   mana_cost: String
@@ -325,7 +411,7 @@ type Card {
   image_status: String!
   image_uris: CardImagery
   oversized: Boolean!
-  prices: JSON!
+  prices: Prices!
   printed_name: String
   printed_text: String
   printed_type_line: String
@@ -408,11 +494,6 @@ enum Language {
 A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
-
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 "\n  The frame_effects field tracks additional frame artwork applied over a particular frame. \n  For example, there are both 2003 and 2015-frame cards with the Nyx-touched effect.\n  "
 enum FrameEffect {
@@ -511,6 +592,11 @@ enum Frame {
   """The frame used on cards from the future"""
   future
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 type CardPage {
   rows: [Card!]!
