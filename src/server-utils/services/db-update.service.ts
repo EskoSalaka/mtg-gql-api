@@ -102,7 +102,7 @@ export class DBUpdateService {
     } catch (error) {
       log(error);
       this.logger.error('Update Failed. Rolling back update...');
-      //this.logger.error(error);
+      this.logger.error(error);
     } finally {
       this.logger.log('Update complete');
       this.logger.log('--------------------------------------------------------------');

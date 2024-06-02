@@ -1,4 +1,4 @@
-import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { CardPage } from './types/CardPage.type';
 import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { PageInfo } from 'src/common/types/page-info.type';
@@ -11,8 +11,6 @@ const { fieldsList } = require('graphql-fields-list');
 import * as _ from 'lodash';
 import { Logger } from '@nestjs/common';
 import { replaceKeysDeep } from './utils';
-import Frame from './types/frame.type';
-import { log } from 'console';
 
 @Resolver(() => Card)
 export class CardResolver {

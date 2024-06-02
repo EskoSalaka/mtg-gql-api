@@ -1,5 +1,4 @@
 import Language from '../types/language.type';
-import Layout from '../types/layout.type';
 import { CardFaceDTO } from './card-face.dto';
 import Color from '../types/color.type';
 import { Expose, Transform, Type } from 'class-transformer';
@@ -12,10 +11,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  isURL,
   IsUrl,
   IsUUID,
-  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 

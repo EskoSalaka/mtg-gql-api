@@ -64,7 +64,7 @@ export class CardFace extends Model<CardFaceAttributes, CardFaceCreationAttribut
   })
   @Field()
   @Index
-  id: number;
+  id: string;
 
   @ForeignKey(() => Card)
   @Column(DataType.UUID)

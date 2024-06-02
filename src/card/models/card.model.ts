@@ -18,6 +18,9 @@ import { Set } from 'src/set/models/set.model';
 import Layout from '../types/layout.type';
 import Frame from '../types/frame.type';
 import FrameEffect from '../types/frame-effect.type';
+import { Legalities } from '../types/legalities.type';
+import { Prices } from '../types/prices.type';
+import { RelatedCardInfo } from '../types/related-object.type';
 
 export interface CardAttributes {
   //Core Card Fields
@@ -48,7 +51,7 @@ export interface CardAttributes {
   edhrec_rank: number | null;
   hand_modifier: string | null;
   keywords: string[];
-  legalities: object;
+  legalities: Legalities;
   life_modifier: string | null;
   loyalty: string | null;
   mana_cost: string | null;
@@ -81,9 +84,9 @@ export interface CardAttributes {
   highres_image: boolean;
   illustration_id: string | null;
   image_status: string;
-  image_uris: object | null;
+  image_uris: CardImagery | null;
   oversized: boolean;
-  prices: object;
+  prices: Prices;
   printed_name: string | null;
   printed_text: string | null;
   printed_type_line: string | null;
@@ -207,7 +210,8 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
 
   //Gameplay Fields
   @Column(DataType.JSONB)
-  all_parts: any | null;
+  @Field(() => [RelatedCardInfo], { nullable: true })
+  all_parts: RelatedCardInfo[] | null;
 
   @HasMany(() => CardFace)
   @Field(() => [CardFace], { nullable: true })
@@ -247,8 +251,8 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   keywords: string[];
 
   @Column(DataType.JSONB)
-  @Field(() => JSONResolver, { nullable: true })
-  legalities: object;
+  @Field(() => Legalities, { nullable: true })
+  legalities: Legalities;
 
   @Column(DataType.STRING)
   @Field({ nullable: true })
@@ -374,15 +378,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
 
   @Column(DataType.JSONB)
   @Field(() => CardImagery, { nullable: true })
-  image_uris: object | null;
+  image_uris: CardImagery | null;
 
   @Column(DataType.BOOLEAN)
   @Field()
   oversized: boolean;
 
   @Column(DataType.JSONB)
-  @Field(() => JSONResolver)
-  prices: object;
+  @Field(() => Prices)
+  prices: Prices;
 
   @Column(DataType.STRING)
   @Field({ nullable: true })
