@@ -37,7 +37,7 @@ export class CardResolver {
     let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
 
     let topLevelCardAttrMap = Object.keys(Card.getAttributes()).reduce((acc, key) => {
-      acc[key] = `$card.${key}$`;
+      acc[key] = `$Card.${key}$`;
       return acc;
     }, {});
     let topLevelCardFaceAttrMap = Object.keys(CardFace.getAttributes()).reduce((acc, key) => {
@@ -51,11 +51,7 @@ export class CardResolver {
     let count = await this.cardModel.count({
       distinct: true,
       where: mappedWhere as any,
-      include: [
-        {
-          model: CardFace,
-        },
-      ],
+      include: [CardFace],
     });
 
     let rows = await this.cardModel.findAll({
@@ -63,11 +59,11 @@ export class CardResolver {
       offset: query.limit * (query.page - 1),
       attributes: cardAttributes,
       where: mappedWhere as any,
+      order: query.order ? query.order : [['name', 'ASC']],
       include: [
         {
           model: CardFace,
           attributes: cardFaceAttributes,
-          duplicating: false,
         },
       ],
     });
