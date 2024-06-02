@@ -1,6 +1,7 @@
 import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDataURI,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -10,6 +11,7 @@ import {
   ValidateIf,
   validateSync,
 } from 'class-validator';
+import { Dialect } from 'sequelize';
 
 export enum Environment {
   Development = 'development',
@@ -61,6 +63,26 @@ export class EnvironmentVariables {
   LOG_PATH?: string = './logs/logging.log';
 
   // Database configuration
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  DB_DIALECT: Dialect = 'sqlite';
+
+  @Expose()
+  @IsOptional()
+  @IsBoolean()
+  DB_SYNCHRONIZE: boolean = true;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  DB_URI: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString()
+  DB_STORAGE: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {

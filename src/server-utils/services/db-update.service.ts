@@ -3,12 +3,13 @@ import { log } from 'console';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { plainToInstance } from 'class-transformer';
-import { CardFace } from 'src/card/models/card-face.model';
-import { Card } from 'src/card/models/card.model';
+import { CardFace, cardFaceUpdateFields } from 'src/card/models/card-face.model';
+import { Card, cardUpdateFields } from 'src/card/models/card.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
 import { ScryfallDataDTO } from '../DTO/scryfall-data.dto';
+import { Set, setUpdateFields } from 'src/set/models/set.model';
 const fs = require('fs');
 
 @Injectable()
@@ -18,8 +19,8 @@ export class DBUpdateService {
   constructor(
     private http: HttpService,
     @InjectModel(Card) private cardModel: typeof Card,
-    @InjectModel(Set) private setModel: typeof Card,
-    @InjectModel(CardFace) private cardFaceModel: typeof Card,
+    @InjectModel(Set) private setModel: typeof Set,
+    @InjectModel(CardFace) private cardFaceModel: typeof CardFace,
     private db: Sequelize,
   ) {}
 
@@ -27,15 +28,8 @@ export class DBUpdateService {
     this.logger.log('--------------------------------------------------------------');
     this.logger.log('Updating database');
 
-    // application logic...
     try {
       await this.db.transaction(async (tx) => {
-        this.logger.log('Truncating cards, card_faces and sets tables. Starting transaction...');
-        await this.cardFaceModel.truncate({ transaction: tx });
-        await this.cardModel.truncate({ transaction: tx });
-        await this.setModel.truncate({ transaction: tx });
-        this.logger.log('Done truncating tables...');
-
         this.logger.log('Downloading set data from scryfall...');
         const setsJSONData = await (
           await firstValueFrom(this.http.get('https://api.scryfall.com/sets'))
@@ -48,7 +42,13 @@ export class DBUpdateService {
         let bulkData = bulkDataOptions.find((bdo) => bdo.type === bulkDataType);
 
         this.logger.log('Downloading card data from scryfall...');
-        const cardsJSONData = (await firstValueFrom(this.http.get(bulkData.download_uri, {}))).data;
+
+        let cardsJSONData = (await firstValueFrom(this.http.get(bulkData.download_uri, {}))).data;
+
+        //let openedFile = await fs.promises.open('cards.json', 'r');
+
+        this.logger.debug('Done downloading bulk card data...');
+        //let cardsJSONData = JSON.parse(await openedFile.readFile('utf8'));
         this.logger.log('Done downloading bulk card data...');
 
         this.logger.log('Validating data...');
@@ -68,9 +68,6 @@ export class DBUpdateService {
         });
 
         if (errors.length > 0) {
-          log(errors[0].children[0]);
-          log(errors[0].children[0].children[0]);
-          log(errors[0].children[0].children[0].value);
           throw errors;
         }
 
@@ -80,18 +77,30 @@ export class DBUpdateService {
         await this.setModel.bulkCreate(scryfallData.sets as any, {
           logging: false,
           transaction: tx,
+          updateOnDuplicate: setUpdateFields,
         });
         this.logger.log('Done inserting set data...');
 
         this.logger.log('Inserting card data into database...');
         await this.cardModel.bulkCreate(scryfallData.cards as any, {
           logging: false,
-          include: [{ model: CardFace, as: 'card_faces' }],
+          updateOnDuplicate: cardUpdateFields,
           transaction: tx,
         });
+        this.logger.log('Done inserting card data...');
+
+        this.logger.log('Inserting card face data into database...');
+        let cardFaces = scryfallData.cards.map((c) => c.card_faces).flat();
+
+        await this.cardFaceModel.bulkCreate(cardFaces, {
+          logging: false,
+          updateOnDuplicate: cardFaceUpdateFields,
+          transaction: tx,
+        });
+        this.logger.log('Done inserting card face data...');
       });
     } catch (error) {
-      //console.log(error[0]);
+      log(error);
       this.logger.error('Update Failed. Rolling back update...');
       //this.logger.error(error);
     } finally {

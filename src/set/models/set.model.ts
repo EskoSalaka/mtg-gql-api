@@ -4,13 +4,50 @@ import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { Card } from 'src/card/models/card.model';
 import SetType from '../types/set-type.type';
 
-@Table({ tableName: 'set', underscored: true, timestamps: false })
+export interface SetAttributes {
+  id: string;
+  object: string;
+  code: string;
+  mtgo_code: string | null;
+  arena_code: string | null;
+  tcgplayer_id: number | null;
+  name: string;
+  set_type: string;
+  released_at: Date;
+  block_code: string | null;
+  block: string | null;
+  parent_set_code: string | null;
+  card_count: number;
+  printed_size: number | null;
+  digital: boolean;
+  foil_only: boolean;
+  nonfoil_only: boolean;
+  scryfall_uri: string;
+  uri: string;
+  icon_svg_uri: string;
+  search_uri: string;
+}
+
+export interface SetCreationAttributes extends SetAttributes {}
+
+export const setUpdateFields: Array<keyof SetCreationAttributes> = [
+  'card_count',
+  'digital',
+  'foil_only',
+  'nonfoil_only',
+  'scryfall_uri',
+  'uri',
+  'icon_svg_uri',
+  'search_uri',
+];
+
+@Table({ tableName: 'Sets', underscored: true, timestamps: false })
 @ObjectType()
-export class Set extends Model<Set> {
+export class Set extends Model<SetAttributes, SetCreationAttributes> {
   //Core Set Fields
   @Column({
     primaryKey: true,
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
   })
   @Field(() => UUIDResolver)
   id: string;

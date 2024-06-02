@@ -19,19 +19,130 @@ import Layout from '../types/layout.type';
 import Frame from '../types/frame.type';
 import FrameEffect from '../types/frame-effect.type';
 
-@Table({ tableName: 'card', underscored: true, timestamps: false })
+export interface CardAttributes {
+  //Core Card Fields
+  id: string;
+  lang: Language;
+  arena_id: number | null;
+  mtgo_id: number | null;
+  mtgo_foil_id: number | null;
+  multiverse_ids: number[] | null;
+  tcgplayer_id: number | null;
+  tcgplayer_etched_id: number | null;
+  cardmarket_id: number | null;
+  object: string;
+  layout: string;
+  oracle_id: string | null;
+  prints_search_uri: string;
+  rulings_uri: string;
+  scryfall_uri: string;
+  uri: string;
+
+  //Gameplay Fields
+  all_parts: any | null;
+  cmc: number | null;
+  color_identity: Color[];
+  color_indicator: Color[] | null;
+  colors: Color[] | null;
+  defense: string | null;
+  edhrec_rank: number | null;
+  hand_modifier: string | null;
+  keywords: string[];
+  legalities: object;
+  life_modifier: string | null;
+  loyalty: string | null;
+  mana_cost: string | null;
+  name: string;
+  oracle_text: string | null;
+  penny_rank: number | null;
+  power: string | null;
+  produced_mana: Color[] | null;
+  reserved: boolean;
+  toughness: string | null;
+  type_line: string | null;
+
+  //Print Fields
+  artist: string | null;
+  artist_ids: string[] | null;
+  attraction_lights: string | null;
+  booster: boolean;
+  border_color: string;
+  card_back_id: string;
+  collector_number: string;
+  content_warning: boolean | null;
+  digital: boolean;
+  finishes: string | null;
+  flavor_name: string | null;
+  flavor_text: string | null;
+  frame_effects: string[] | null;
+  frame: string;
+  full_art: boolean;
+  games: string | null;
+  highres_image: boolean;
+  illustration_id: string | null;
+  image_status: string;
+  image_uris: object | null;
+  oversized: boolean;
+  prices: object;
+  printed_name: string | null;
+  printed_text: string | null;
+  printed_type_line: string | null;
+  promo: boolean;
+  promo_types: string[] | null;
+  purchase_uris: object | null;
+  rarity: string;
+  related_uris: object;
+  released_at: Date;
+  reprint: boolean;
+  scryfall_set_uri: string;
+  set_name: string;
+  set_search_uri: string;
+  set_type: string;
+  set_uri: string;
+  set_code: string;
+  set_id: string;
+  story_spotlight: boolean;
+  textless: boolean;
+  variation: boolean;
+  variation_of: string | null;
+  security_stamp: string | null;
+  watermark: string | null;
+}
+
+export interface CardCreationAttributes extends CardAttributes {}
+
+export const cardUpdateFields: Array<keyof CardCreationAttributes> = [
+  'prints_search_uri',
+  'rulings_uri',
+  'scryfall_uri',
+  'uri',
+  'all_parts',
+  'edhrec_rank',
+  'legalities',
+  'oracle_text',
+  'flavor_text',
+  'full_art',
+  'games',
+  'highres_image',
+  'image_status',
+  'image_uris',
+  'prices',
+  'printed_text',
+  'purchase_uris',
+  'scryfall_set_uri',
+  'set_search_uri',
+];
+
+@Table({ tableName: 'Cards', timestamps: false })
 @ObjectType()
-export class Card extends Model<Card> {
+export class Card extends Model<CardAttributes, CardCreationAttributes> {
   //Core Card Fields
   @Column({
     primaryKey: true,
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
   })
   @Field(() => UUIDResolver)
   id: string;
-
-  @HasOne(() => Card, { foreignKey: 'id' })
-  selfJoin: Card;
 
   @Index
   @Column(DataType.STRING)
@@ -50,7 +161,7 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   mtgo_foil_id: number | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [Number], { nullable: true })
   multiverse_ids: number[] | null;
 
@@ -74,7 +185,7 @@ export class Card extends Model<Card> {
   @Field(() => Layout)
   layout: string;
 
-  @Column(DataType.UUIDV4)
+  @Column(DataType.UUID)
   @Field({ nullable: true })
   oracle_id: string | null;
 
@@ -95,7 +206,7 @@ export class Card extends Model<Card> {
   uri: string;
 
   //Gameplay Fields
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   all_parts: any | null;
 
   @HasMany(() => CardFace)
@@ -106,15 +217,15 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   cmc: number | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [Color])
   color_identity: Color[];
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [Color], { nullable: true })
   color_indicator: Color[] | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Index
   @Field(() => [Color], { nullable: true })
   colors: Color[] | null;
@@ -131,11 +242,11 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   hand_modifier: string | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [String])
   keywords: string[];
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => JSONResolver, { nullable: true })
   legalities: object;
 
@@ -156,7 +267,7 @@ export class Card extends Model<Card> {
   @Field()
   name: string;
 
-  @Column(DataType.STRING)
+  @Column(DataType.TEXT('long'))
   @Field({ nullable: true })
   oracle_text: string | null;
 
@@ -168,7 +279,7 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   power: string | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [Color], { nullable: true })
   produced_mana: Color[] | null;
 
@@ -189,11 +300,11 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   artist: string | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [String], { nullable: true })
   artist_ids: string[] | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [String], { nullable: true })
   attraction_lights: string | null;
 
@@ -205,7 +316,7 @@ export class Card extends Model<Card> {
   @Field()
   border_color: string;
 
-  @Column(DataType.UUIDV4)
+  @Column(DataType.UUID)
   @Field({ nullable: true })
   card_back_id: string;
 
@@ -221,7 +332,7 @@ export class Card extends Model<Card> {
   @Field()
   digital: boolean;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [String], { nullable: true })
   finishes: string | null;
 
@@ -229,11 +340,11 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   flavor_name: string | null;
 
-  @Column(DataType.STRING)
+  @Column(DataType.TEXT('long'))
   @Field({ nullable: true })
   flavor_text: string | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field((type) => [FrameEffect], { nullable: true })
   frame_effects: string[] | null;
 
@@ -245,7 +356,7 @@ export class Card extends Model<Card> {
   @Field()
   full_art: boolean;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [String], { nullable: true })
   games: string | null;
 
@@ -253,7 +364,7 @@ export class Card extends Model<Card> {
   @Field()
   highres_image: boolean;
 
-  @Column(DataType.UUIDV4)
+  @Column(DataType.UUID)
   @Field({ nullable: true })
   illustration_id: string | null;
 
@@ -261,7 +372,7 @@ export class Card extends Model<Card> {
   @Field()
   image_status: string;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => CardImagery, { nullable: true })
   image_uris: object | null;
 
@@ -269,7 +380,7 @@ export class Card extends Model<Card> {
   @Field()
   oversized: boolean;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => JSONResolver)
   prices: object;
 
@@ -277,7 +388,7 @@ export class Card extends Model<Card> {
   @Field({ nullable: true })
   printed_name: string | null;
 
-  @Column(DataType.STRING)
+  @Column(DataType.TEXT('long'))
   @Field({ nullable: true })
   printed_text: string | null;
 
@@ -289,11 +400,11 @@ export class Card extends Model<Card> {
   @Field()
   promo: boolean;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [String], { nullable: true })
   promo_types: string[] | null;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => JSONResolver, { nullable: true })
   purchase_uris: object | null;
 
@@ -301,7 +412,7 @@ export class Card extends Model<Card> {
   @Field()
   rarity: string;
 
-  @Column(DataType.JSON)
+  @Column(DataType.JSONB)
   @Field(() => [URLResolver], { nullable: true })
   related_uris: object;
 
@@ -333,13 +444,13 @@ export class Card extends Model<Card> {
   set_uri: string;
 
   @Column({
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
     field: 'set',
   })
   @Field()
   set_code: string;
 
-  @Column(DataType.UUIDV4)
+  @Column(DataType.UUID)
   @ForeignKey(() => Set)
   @Field(() => UUIDResolver)
   set_id: string;
@@ -356,7 +467,7 @@ export class Card extends Model<Card> {
   @Field()
   variation: boolean;
 
-  @Column(DataType.UUIDV4)
+  @Column(DataType.UUID)
   @Field({ nullable: true })
   variation_of: string | null;
 

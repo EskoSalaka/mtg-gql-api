@@ -100,11 +100,29 @@ export class CardDTO {
   @IsArray()
   all_parts: any | null = null;
 
+  /**
+   * When creating a new CardFace, we need to create a unique id for it based on the related card_id so
+   * that it is always the same for the same card face. We can do this simply by using the card_id and
+   * appending a number to it. This way we can always identify the card face and update it in the database
+   * when we get new data from the scryfall API. Its not a UUID but its fine for our purposes.
+   *
+   * We cant use a simple auto-incrementing id for the CardFace because we cant ensure the order of the data
+   * coming from the scryfall API. We need to be able to uniquely identify each card face so that we can
+   * update the data in the database when we get new data from the scryfall API.
+   */
   @Expose()
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CardFaceDTO)
+  @Transform(({ value, obj }) =>
+    value.map((v, i) => {
+      v.card_id = obj.id;
+      v.id = `${obj.id}-${i}`;
+
+      return v;
+    }),
+  )
   card_faces: CardFaceDTO[] = [];
 
   @Expose()
