@@ -1,8 +1,8 @@
-import { Expose, plainToInstance, Transform, Type } from 'class-transformer';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
 import {
   IsBoolean,
-  IsDataURI,
   IsEnum,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -27,6 +27,9 @@ export enum LogLevel {
   Verbose = 'verbose',
 }
 
+export const logTransports = ['console', 'file'] as const;
+export type LogTransport = (typeof logTransports)[number];
+
 export const logLevels = {
   [LogLevel.Error]: 0,
   [LogLevel.Info]: 1,
@@ -34,9 +37,16 @@ export const logLevels = {
   [LogLevel.Verbose]: 3,
 };
 
+export enum SupportedDialects {
+  Postgres = 'postgres',
+  Sqlite = 'sqlite',
+}
+
 export class EnvironmentVariables {
   @Expose()
-  @IsEnum(Environment)
+  @IsEnum(Environment, {
+    message: 'NODE_ENV must be one of: development, production, test, provision',
+  })
   NODE_ENV: Environment = Environment.Development;
 
   @Expose()
@@ -49,11 +59,15 @@ export class EnvironmentVariables {
   @Expose()
   @IsOptional()
   @Transform(({ value }) => value.split(',').map((v: string) => v.trim()))
-  LOG_TRANSPORTS: Array<'console' | 'file'> = ['console', 'file'];
+  @IsIn(logTransports, {
+    each: true,
+    message: 'LOG_TRANSPORTS must be one or many of: console, file',
+  })
+  LOG_TRANSPORTS: Array<LogTransport> = ['console', 'file'];
 
   @Expose()
   @IsOptional()
-  @IsEnum(LogLevel)
+  @IsEnum(LogLevel, { message: 'LOG_LEVEL must be one of: error, info, debug, verbose' })
   LOG_LEVEL: LogLevel = LogLevel.Verbose;
 
   @Expose()
@@ -67,6 +81,7 @@ export class EnvironmentVariables {
   @Expose()
   @IsOptional()
   @IsString()
+  @IsEnum(SupportedDialects, { message: 'DB_DIALECT must be one of: postgres, sqlite' })
   DB_DIALECT: Dialect = 'sqlite';
 
   @Expose()
@@ -95,7 +110,7 @@ export function validateEnvironment(config: Record<string, unknown>) {
   const errors = validateSync(validatedConfig, { skipMissingProperties: false });
 
   if (errors.length > 0) {
-    throw new Error(errors.toString());
+    throw errors;
   }
   return validatedConfig;
 }
