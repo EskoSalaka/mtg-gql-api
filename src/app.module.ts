@@ -1,14 +1,5 @@
-import {
-  Global,
-  Logger,
-  MiddlewareConsumer,
-  Module,
-  ValidationPipe,
-  LoggerService,
-} from '@nestjs/common';
-
+import { Global, Logger, Module, ValidationPipe } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import * as SQLite from 'sqlite3';
 import * as path from 'path';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -24,14 +15,7 @@ import * as winston from 'winston';
 import { APP_PIPE } from '@nestjs/core';
 import { SequelizeLoggerService } from './sequelize-logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import {
-  Environment,
-  EnvironmentVariables,
-  LogLevel,
-  logLevels,
-  validateEnvironment,
-} from './environment.config';
-import { log } from 'console';
+import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
 
 @Global()
 @Module({
@@ -89,23 +73,21 @@ import { log } from 'console';
     }),
     SequelizeModule.forRootAsync({
       imports: [],
-      useFactory: () => {
+      useFactory: (config: ConfigService<EnvironmentVariables>) => {
         let logger = new Logger('Sequelize');
 
         return {
-          dialect: 'sqlite',
-          storage: path.join(__dirname, '..', 'mtg-database.sqlite'),
-          synchronize: true,
-          logging: (sql) => logger.verbose(sql),
-          dialectOptions: {
-            mode: SQLite.OPEN_READWRITE | SQLite.OPEN_CREATE | SQLite.OPEN_FULLMUTEX,
-          },
+          dialect: config.get('DB_DIALECT'),
+          uri: config.get('DB_URI'),
+          synchronize: config.get('DB_SYNCHRONIZE'),
+          logging: (sql, timimgs) => logger.verbose(sql),
           autoLoadModels: true,
           models: [Card, CardFace, Set],
           repositoryMode: false,
+          ssl: true,
         };
       },
-      inject: [],
+      inject: [ConfigService],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
