@@ -45,7 +45,6 @@
     "graphql-sequelize": "^9.5.1",
     "lodash": "^4.17.21",
     "nest-winston": "^1.10.0",
-    "nestjs-graphql-tools": "^0.9.0",
     "pg": "^8.11.5",
     "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.2.0",
