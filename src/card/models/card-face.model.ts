@@ -1,22 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import {
-  BeforeBulkCreate,
-  BeforeBulkUpdate,
-  BeforeCreate,
-  BeforeUpdate,
-  Column,
-  DataType,
-  ForeignKey,
-  Index,
-  Model,
-  Table,
-} from 'sequelize-typescript';
+import { Column, DataType, ForeignKey, Index, Model, Table } from 'sequelize-typescript';
 import { Card } from './card.model';
 import { UUIDResolver } from 'graphql-scalars';
 import Color from '../types/color.type';
 import { CardImagery } from '../types/card-imagery.type';
 import Layout from '../types/layout.type';
-import { v5 as uuidv5 } from 'uuid';
 import { Optional } from 'sequelize';
 
 export interface CardFaceAttributes {
