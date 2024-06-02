@@ -628,8 +628,8 @@ type SetHeader {
 }
 
 type Query {
-  set(id: String!): [SetHeader!]!
-  sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [Set!]!
+  set(id: String!): Set!
+  sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
 }
