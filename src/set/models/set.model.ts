@@ -41,7 +41,7 @@ export const setUpdateFields: Array<keyof SetCreationAttributes> = [
   'search_uri',
 ];
 
-@Table({ tableName: 'Sets', underscored: true, timestamps: false })
+@Table({ tableName: 'Sets', underscored: true, timestamps: true })
 @ObjectType()
 export class Set extends Model<SetAttributes, SetCreationAttributes> {
   //Core Set Fields

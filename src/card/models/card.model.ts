@@ -1,13 +1,4 @@
-import {
-  Column,
-  DataType,
-  ForeignKey,
-  HasMany,
-  HasOne,
-  Index,
-  Model,
-  Table,
-} from 'sequelize-typescript';
+import { Column, DataType, ForeignKey, HasMany, Index, Model, Table } from 'sequelize-typescript';
 import Color from '../types/color.type';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { JSONResolver, URLResolver, UUIDResolver } from 'graphql-scalars';
@@ -136,7 +127,7 @@ export const cardUpdateFields: Array<keyof CardCreationAttributes> = [
   'set_search_uri',
 ];
 
-@Table({ tableName: 'Cards', timestamps: false })
+@Table({ tableName: 'Cards', timestamps: true })
 @ObjectType()
 export class Card extends Model<CardAttributes, CardCreationAttributes> {
   //Core Card Fields

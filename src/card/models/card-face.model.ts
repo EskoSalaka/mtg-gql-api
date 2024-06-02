@@ -55,7 +55,7 @@ export const cardFaceUpdateFields: Array<keyof CardFaceCreationAttributes> = [
   'printed_text',
 ];
 
-@Table({ tableName: 'CardFaces', underscored: true, timestamps: false })
+@Table({ tableName: 'CardFaces', underscored: true, timestamps: true })
 @ObjectType()
 export class CardFace extends Model<CardFaceAttributes, CardFaceCreationAttributes> {
   @Column({
