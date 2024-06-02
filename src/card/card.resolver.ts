@@ -2,7 +2,6 @@ import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { CardPage } from './types/CardPage.type';
 import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { PageInfo } from 'src/common/types/page-info.type';
-import { SelectedFields, SelectedFieldsResult } from 'nestjs-graphql-tools';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { Card } from './models/card.model';
 import { CardFace } from './models/card-face.model';
@@ -21,9 +20,13 @@ export class CardResolver {
   ) {}
 
   @Query(() => Card)
-  async card(@Args('id') id: string, @SelectedFields() selectedFields: SelectedFieldsResult) {
+  async card(@Args('id') id: string, @Info() context: ExecutionContextHost) {
+    let cardAttributes = fieldsList(context, { path: 'rows', skip: ['rows.card_faces'] });
+    let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
+
     let card = await this.cardModel.findByPk(id, {
-      include: [CardFace],
+      include: [{ model: CardFace, attributes: cardFaceAttributes }],
+      attributes: cardAttributes,
     });
 
     return card;

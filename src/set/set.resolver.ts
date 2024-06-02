@@ -1,12 +1,22 @@
-import { Args, ObjectType, OmitType, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Info,
+  ObjectType,
+  OmitType,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { WhereQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { plainToInstance } from 'class-transformer';
-import { SelectedFields, SelectedFieldsResult } from 'nestjs-graphql-tools';
 import { InjectModel } from '@nestjs/sequelize';
 import { log } from 'console';
 import { CardFace } from 'src/card/models/card-face.model';
 import { Card } from 'src/card/models/card.model';
 import { Set } from './models/set.model';
+const { fieldsList } = require('graphql-fields-list');
+import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 
 @Resolver(() => Set)
 export class SetResolver {
@@ -15,53 +25,47 @@ export class SetResolver {
     private setModel: typeof Set,
   ) {}
 
-  @Query(() => [SetHeader])
-  async set(@Args('id') id: string, @SelectedFields() selectedFields: SelectedFieldsResult) {
-    let set = await this.setModel.findByPk(id, {
-      attributes: selectedFields.fieldsData.fieldsString,
-    });
+  @Query(() => Set)
+  async set(@Args('id') id: string, @Info() context: ExecutionContextHost) {
+    let selectedFields = fieldsList(context, { skip: ['cards'] });
 
-    return plainToInstance(Set, set.toJSON());
+    return this.setModel.findByPk(id, {
+      attributes: selectedFields,
+    });
   }
 
-  @Query(() => [Set])
-  async sets(
-    @Args() query: WhereQueryArgs,
-    @SelectedFields() selectedFields: SelectedFieldsResult,
-  ) {
-    let sets = await this.setModel.findAll({
-      where: query.where,
-      attributes: selectedFields.fieldsData.fieldsString,
-    });
+  @Query(() => [SetHeader])
+  async sets(@Args() query: WhereQueryArgs, @Info() context: ExecutionContextHost) {
+    let selectedFields = fieldsList(context, { skip: ['cards'] });
 
-    return plainToInstance(
-      Set,
-      sets.map((set) => set.toJSON()),
-    );
+    return this.setModel.findAll({
+      where: query.where,
+      attributes: selectedFields,
+    });
   }
 
   @ResolveField()
-  async cards(@Parent() parent: Set, @SelectedFields() selectedFields: SelectedFieldsResult) {
-    log(parent);
-    log(selectedFields.fieldsData);
+  async cards(@Parent() parent: Set, @Info() context: ExecutionContextHost) {
+    let cardAttributes = fieldsList(context, { path: 'rows', skip: ['rows.card_faces'] });
+    let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
+
     let set = await this.setModel.findByPk(parent.id, {
       include: [
         {
           model: Card,
-          attributes: selectedFields.fieldsData.fieldsString,
+          as: 'Cards',
+          attributes: cardAttributes,
           include: [
             {
               model: CardFace,
+              attributes: cardFaceAttributes,
             },
           ],
         },
       ],
     });
 
-    return plainToInstance(
-      Card,
-      set.cards.map((card) => card.toJSON()),
-    );
+    return set.cards;
   }
 }
 
