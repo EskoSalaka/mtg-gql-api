@@ -1,21 +1,12 @@
-import {
-  Args,
-  Info,
-  ObjectType,
-  OmitType,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { WhereQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { InjectModel } from '@nestjs/sequelize';
-import { log } from 'console';
 import { CardFace } from 'src/card/models/card-face.model';
 import { Card } from 'src/card/models/card.model';
 import { Set } from './models/set.model';
 const { fieldsList } = require('graphql-fields-list');
 import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
+import { SetHeader } from './types/set-header';
 
 @Resolver(() => Set)
 export class SetResolver {
@@ -66,6 +57,3 @@ export class SetResolver {
     return set.cards;
   }
 }
-
-@ObjectType()
-export class SetHeader extends OmitType(Set, ['cards'] as const) {}
