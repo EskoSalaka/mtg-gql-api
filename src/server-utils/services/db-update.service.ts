@@ -10,6 +10,8 @@ import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
 import { ScryfallDataDTO } from '../DTO/scryfall-data.dto';
 import { Set, setUpdateFields } from 'src/set/models/set.model';
+import { Ruling, rulingUpdateFields } from 'src/card/models/ruling.model';
+import * as _ from 'lodash';
 const fs = require('fs');
 
 @Injectable()
@@ -21,6 +23,7 @@ export class DBUpdateService {
     @InjectModel(Card) private cardModel: typeof Card,
     @InjectModel(Set) private setModel: typeof Set,
     @InjectModel(CardFace) private cardFaceModel: typeof CardFace,
+    @InjectModel(Ruling) private rulingModel: typeof Ruling,
     private db: Sequelize,
   ) {}
 
@@ -30,31 +33,45 @@ export class DBUpdateService {
 
     try {
       await this.db.transaction(async (tx) => {
-        this.logger.log('Downloading set data from scryfall...');
-        const setsJSONData = await (
-          await firstValueFrom(this.http.get('https://api.scryfall.com/sets'))
-        ).data.data;
-
         const bulkDataOptions = (
           await firstValueFrom(this.http.get('https://api.scryfall.com/bulk-data', {}))
         ).data.data as IScryfallBulkData[];
 
         let bulkData = bulkDataOptions.find((bdo) => bdo.type === bulkDataType);
+        let bulkRulingsData = bulkDataOptions.find((bdo) => bdo.type === 'rulings');
 
-        this.logger.log('Downloading card data from scryfall...');
+        this.logger.log('Downloading set data from scryfall...');
+        const setsJSONData = await (
+          await firstValueFrom(this.http.get('https://api.scryfall.com/sets'))
+        ).data.data;
+        this.logger.log('Done downloading set data...');
 
+        this.logger.log('Downloading bulk card data from scryfall...');
         let cardsJSONData = (await firstValueFrom(this.http.get(bulkData.download_uri, {}))).data;
-
-        //let openedFile = await fs.promises.open('cards.json', 'r');
-
-        this.logger.debug('Done downloading bulk card data...');
-        //let cardsJSONData = JSON.parse(await openedFile.readFile('utf8'));
         this.logger.log('Done downloading bulk card data...');
+
+        this.logger.log('Downloading rulings data from scryfall...');
+        let rulingsJSONData = (
+          await firstValueFrom(this.http.get(bulkRulingsData.download_uri, {}))
+        ).data;
+        this.logger.log('Done downloading rulings data...');
+
+        rulingsJSONData = _(rulingsJSONData)
+          .groupBy('oracle_id')
+          .mapValues((rulings) =>
+            rulings.map((ruling, i) => ({
+              ...ruling,
+              id: `${ruling.oracle_id}-${i}`,
+            })),
+          )
+          .values()
+          .flatten()
+          .value();
 
         this.logger.log('Validating data...');
         let scryfallData = plainToInstance(
           ScryfallDataDTO,
-          { cards: cardsJSONData, sets: setsJSONData },
+          { cards: cardsJSONData, sets: setsJSONData, rulings: rulingsJSONData },
           {
             excludeExtraneousValues: true,
             exposeUnsetFields: true,
@@ -98,6 +115,14 @@ export class DBUpdateService {
           transaction: tx,
         });
         this.logger.log('Done inserting card face data...');
+
+        this.logger.log('Inserting ruling data into database...');
+        await this.rulingModel.bulkCreate(scryfallData.rulings as any, {
+          logging: false,
+          updateOnDuplicate: rulingUpdateFields,
+          transaction: tx,
+        });
+        this.logger.log('Done inserting ruling data...');
       });
     } catch (error) {
       log(error);

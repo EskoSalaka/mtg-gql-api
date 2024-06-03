@@ -6,11 +6,12 @@ import { HttpModule } from '@nestjs/axios';
 import { Card } from './models/card.model';
 import { CardFace } from './models/card-face.model';
 import { Set } from 'src/set/models/set.model';
+import { Ruling } from './models/ruling.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Card, CardFace, Set], {
-      models: [Card, CardFace, Set],
+    SequelizeModule.forFeature([Card, CardFace, Set, Ruling], {
+      models: [Card, CardFace, Set, Ruling],
       logging(sql, timing) {
         let logger = new Logger('Sequelize');
         logger.debug(sql, 'Sequelize');

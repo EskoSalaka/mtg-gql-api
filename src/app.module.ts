@@ -16,6 +16,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { SequelizeLoggerService } from './sequelize-logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
+import { Ruling } from './card/models/ruling.model';
 
 @Global()
 @Module({
@@ -82,7 +83,7 @@ import { EnvironmentVariables, logLevels, validateEnvironment } from './environm
           synchronize: config.get('DB_SYNCHRONIZE'),
           logging: (sql, timimgs) => logger.verbose(sql),
           autoLoadModels: true,
-          models: [Card, CardFace, Set],
+          models: [Card, CardFace, Set, Ruling],
           repositoryMode: false,
           ssl: true,
         };
