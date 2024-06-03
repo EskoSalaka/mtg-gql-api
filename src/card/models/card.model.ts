@@ -12,6 +12,7 @@ import FrameEffect from '../types/frame-effect.type';
 import { Legalities } from '../types/legalities.type';
 import { Prices } from '../types/prices.type';
 import { RelatedCardInfo } from '../types/related-object.type';
+import { Ruling } from './ruling.model';
 
 export interface CardAttributes {
   //Core Card Fields
@@ -473,6 +474,10 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Column(DataType.STRING)
   @Field({ nullable: true })
   watermark: string | null;
+
+  @HasMany(() => Ruling, { sourceKey: 'oracle_id', foreignKey: 'oracle_id' })
+  @Field(() => [Ruling], { nullable: true })
+  rulings: Ruling[] | null;
 
   /** 
   @Column(DataType.DATE)

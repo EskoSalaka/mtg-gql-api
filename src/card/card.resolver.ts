@@ -10,6 +10,8 @@ const { fieldsList } = require('graphql-fields-list');
 import * as _ from 'lodash';
 import { Logger } from '@nestjs/common';
 import { replaceKeysDeep } from './utils';
+import { Ruling } from './models/ruling.model';
+import { GraphQLError } from 'graphql';
 
 @Resolver(() => Card)
 export class CardResolver {
@@ -32,8 +34,12 @@ export class CardResolver {
 
   @Query(() => CardPage)
   async cards(@Args() query: DefaultQueryArgs, @Info() context: ExecutionContextHost) {
-    let cardAttributes = fieldsList(context, { path: 'rows', skip: ['rows.card_faces'] });
+    let cardAttributes = fieldsList(context, {
+      path: 'rows',
+      skip: ['rows.card_faces', 'rows.rulings'],
+    });
     let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
+    let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
 
     let topLevelCardAttrMap = Object.keys(Card.getAttributes()).reduce((acc, key) => {
       acc[key] = `$Card.${key}$`;
@@ -43,14 +49,22 @@ export class CardResolver {
       acc['card_faces_' + key] = `$card_faces.${key}$`;
       return acc;
     }, {});
+    let topLevelRulingAttrMap = Object.keys(Ruling.getAttributes()).reduce((acc, key) => {
+      acc['rulings_' + key] = `$rulings.${key}$`;
+      return acc;
+    }, {});
 
-    let mergedAttrmaps = { ...topLevelCardAttrMap, ...topLevelCardFaceAttrMap };
+    let mergedAttrmaps = {
+      ...topLevelCardAttrMap,
+      ...topLevelCardFaceAttrMap,
+      ...topLevelRulingAttrMap,
+    };
     let mappedWhere = replaceKeysDeep(query.where, mergedAttrmaps);
 
     let count = await this.cardModel.count({
       distinct: true,
       where: mappedWhere as any,
-      include: [CardFace],
+      include: [CardFace, Ruling],
     });
 
     let rows = await this.cardModel.findAll({
@@ -63,6 +77,12 @@ export class CardResolver {
         {
           model: CardFace,
           attributes: cardFaceAttributes,
+          duplicating: false,
+        },
+        {
+          model: Ruling,
+          attributes: rulingAttributes,
+          duplicating: false,
         },
       ],
     });

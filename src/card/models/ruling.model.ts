@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, DataType, ForeignKey, Index, Model, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, ForeignKey, Index, Model, Table } from 'sequelize-typescript';
 
 import { Optional } from 'sequelize';
 import { Card } from './card.model';
@@ -30,12 +30,11 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
   @Field()
   id: string;
 
-  @ForeignKey(() => Card)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
-  @Field()
+  @ForeignKey(() => Card)
   oracle_id: string;
 
   @Column({
