@@ -87,7 +87,7 @@ export class EnvironmentVariables {
   @Expose()
   @IsOptional()
   @IsBoolean()
-  DB_SYNCHRONIZE: boolean = true;
+  DB_SYNCHRONIZE: boolean = false;
 
   @Expose()
   @IsOptional()
