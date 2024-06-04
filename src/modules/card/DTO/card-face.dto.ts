@@ -1,11 +1,7 @@
-import { Field, ObjectType } from '@nestjs/graphql';
-import { UUIDResolver } from 'graphql-scalars';
+import { ObjectType } from '@nestjs/graphql';
 import Color from '../types/color.type';
-import { CardImagery } from '../types/card-imagery.type';
-import { Expose, Transform, Type } from 'class-transformer';
-import { Optional } from '@nestjs/common';
+import { Expose } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
-import { CardFace } from '../models/card-face.model';
 
 @ObjectType()
 export class CardFaceDTO {

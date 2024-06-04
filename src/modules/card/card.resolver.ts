@@ -1,5 +1,4 @@
 import { Args, Info, Query, Resolver } from '@nestjs/graphql';
-import { CardPage } from './types/CardPage.type';
 import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { PageInfo } from 'src/common/types/page-info.type';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
@@ -11,7 +10,7 @@ import * as _ from 'lodash';
 import { Logger } from '@nestjs/common';
 import { replaceKeysDeep } from './utils';
 import { Ruling } from './models/ruling.model';
-import { GraphQLError } from 'graphql';
+import { CardPage } from './types/CardPage.type';
 
 @Resolver(() => Card)
 export class CardResolver {

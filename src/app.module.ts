@@ -3,20 +3,20 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import * as path from 'path';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
-import { CardModule } from './card/card.module';
-import { SetModule } from './set/set.module';
+import { SetModule } from './modules/set/set.module';
 import { HttpModule } from '@nestjs/axios';
-import { ServerUtilsModule } from './server-utils/server-utils.module';
-import { CardFace } from './card/models/card-face.model';
-import { Card } from './card/models/card.model';
-import { Set } from './set/models/set.model';
+import { ServerUtilsModule } from './modules/server-utils/server-utils.module';
+import { CardFace } from './modules/card/models/card-face.model';
+import { Card } from './modules/card/models/card.model';
+import { Set } from './modules/set/models/set.model';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { APP_PIPE } from '@nestjs/core';
 import { SequelizeLoggerService } from './sequelize-logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
-import { Ruling } from './card/models/ruling.model';
+import { Ruling } from './modules/card/models/ruling.model';
+import { CardModule } from './modules/card/card.module';
 
 @Global()
 @Module({

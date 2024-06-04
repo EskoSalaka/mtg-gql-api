@@ -5,7 +5,7 @@ import { JSONResolver, URLResolver, UUIDResolver } from 'graphql-scalars';
 import Language from '../types/language.type';
 import { CardImagery } from '../types/card-imagery.type';
 import { CardFace } from './card-face.model';
-import { Set } from 'src/set/models/set.model';
+import { Set } from 'src/modules/set/models/set.model';
 import Layout from '../types/layout.type';
 import Frame from '../types/frame.type';
 import FrameEffect from '../types/frame-effect.type';

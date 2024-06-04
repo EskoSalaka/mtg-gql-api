@@ -3,14 +3,14 @@ import { log } from 'console';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { plainToInstance } from 'class-transformer';
-import { CardFace, cardFaceUpdateFields } from 'src/card/models/card-face.model';
-import { Card, cardUpdateFields } from 'src/card/models/card.model';
+import { CardFace, cardFaceUpdateFields } from 'src/modules/card/models/card-face.model';
+import { Card, cardUpdateFields } from 'src/modules/card/models/card.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
 import { ScryfallDataDTO } from '../DTO/scryfall-data.dto';
-import { Set, setUpdateFields } from 'src/set/models/set.model';
-import { Ruling, rulingUpdateFields } from 'src/card/models/ruling.model';
+import { Set, setUpdateFields } from 'src/modules/set/models/set.model';
+import { Ruling, rulingUpdateFields } from 'src/modules/card/models/ruling.model';
 import * as _ from 'lodash';
 const fs = require('fs');
 

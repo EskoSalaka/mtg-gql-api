@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { UUIDResolver } from 'graphql-scalars';
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import { Card } from 'src/card/models/card.model';
+import { Card } from 'src/modules/card/models/card.model';
 import SetType from '../types/set-type.type';
 
 export interface SetAttributes {

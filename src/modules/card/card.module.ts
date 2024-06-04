@@ -1,12 +1,11 @@
 import { Logger, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-
-import { CardResolver } from './card.resolver';
 import { HttpModule } from '@nestjs/axios';
-import { Card } from './models/card.model';
-import { CardFace } from './models/card-face.model';
-import { Set } from 'src/set/models/set.model';
+import { Set } from 'src/modules/set/models/set.model';
 import { Ruling } from './models/ruling.model';
+import { CardFace } from './models/card-face.model';
+import { Card } from './models/card.model';
+import { CardResolver } from './card.resolver';
 
 @Module({
   imports: [

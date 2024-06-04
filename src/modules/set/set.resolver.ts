@@ -1,8 +1,8 @@
 import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { WhereQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { InjectModel } from '@nestjs/sequelize';
-import { CardFace } from 'src/card/models/card-face.model';
-import { Card } from 'src/card/models/card.model';
+import { CardFace } from 'src/modules/card/models/card-face.model';
+import { Card } from 'src/modules/card/models/card.model';
 import { Set } from './models/set.model';
 const { fieldsList } = require('graphql-fields-list');
 import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
