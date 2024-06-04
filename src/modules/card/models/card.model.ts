@@ -1,6 +1,6 @@
 import { Column, DataType, ForeignKey, HasMany, Index, Model, Table } from 'sequelize-typescript';
 import Color from '../types/color.type';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { JSONResolver, URLResolver, UUIDResolver } from 'graphql-scalars';
 import Language from '../types/language.type';
 import { CardImagery } from '../types/card-imagery.type';
@@ -145,15 +145,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   lang: Language;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   arena_id: number | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   mtgo_id: number | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   mtgo_foil_id: number | null;
 
   @Column(DataType.JSONB)
@@ -161,15 +161,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   multiverse_ids: number[] | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   tcgplayer_id: number | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   tcgplayer_etched_id: number | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   cardmarket_id: number | null;
 
   @Column(DataType.STRING)
@@ -181,7 +181,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   layout: string;
 
   @Column(DataType.UUID)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   oracle_id: string | null;
 
   @Column(DataType.STRING)
@@ -210,7 +210,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   card_faces: CardFace[] | null;
 
   @Column(DataType.DECIMAL)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   cmc: number | null;
 
   @Column(DataType.JSONB)
@@ -227,15 +227,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   colors: Color[] | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   defense: string | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   edhrec_rank: number | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   hand_modifier: string | null;
 
   @Column(DataType.JSONB)
@@ -247,15 +247,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   legalities: Legalities;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   life_modifier: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   loyalty: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   mana_cost: string | null;
 
   @Column(DataType.STRING)
@@ -264,15 +264,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   name: string;
 
   @Column(DataType.TEXT('long'))
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   oracle_text: string | null;
 
   @Column(DataType.INTEGER)
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   penny_rank: number | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   power: string | null;
 
   @Column(DataType.JSONB)
@@ -284,16 +284,16 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   reserved: boolean;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   toughness: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   type_line: string | null;
 
   //Print Fields
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   artist: string | null;
 
   @Column(DataType.JSONB)
@@ -313,7 +313,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   border_color: string;
 
   @Column(DataType.UUID)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   card_back_id: string;
 
   @Column(DataType.STRING)
@@ -321,7 +321,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   collector_number: string;
 
   @Column(DataType.BOOLEAN)
-  @Field({ nullable: true })
+  @Field(() => Boolean, { nullable: true })
   content_warning: boolean | null;
 
   @Column(DataType.BOOLEAN)
@@ -333,15 +333,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   finishes: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   flavor_name: string | null;
 
   @Column(DataType.TEXT('long'))
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   flavor_text: string | null;
 
   @Column(DataType.JSONB)
-  @Field((type) => [FrameEffect], { nullable: true })
+  @Field(() => [FrameEffect], { nullable: true })
   frame_effects: string[] | null;
 
   @Column(DataType.STRING)
@@ -361,7 +361,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   highres_image: boolean;
 
   @Column(DataType.UUID)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   illustration_id: string | null;
 
   @Column(DataType.STRING)
@@ -381,15 +381,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   prices: Prices;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   printed_name: string | null;
 
   @Column(DataType.TEXT('long'))
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   printed_text: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   printed_type_line: string | null;
 
   @Column(DataType.BOOLEAN)
@@ -464,15 +464,15 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   variation: boolean;
 
   @Column(DataType.UUID)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   variation_of: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   security_stamp: string | null;
 
   @Column(DataType.STRING)
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   watermark: string | null;
 
   @HasMany(() => Ruling, { sourceKey: 'oracle_id', foreignKey: 'oracle_id' })

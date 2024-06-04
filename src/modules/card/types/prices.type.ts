@@ -7,30 +7,30 @@ import { Expose } from 'class-transformer';
 })
 export class Prices {
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   usd: string | null;
 
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   usd_foil: string | null;
 
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   usd_etched: string | null;
 
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   eur: string | null;
 
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   eur_foil: string | null;
 
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   eur_etched: string | null;
 
   @Expose()
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   tix: string | null;
 }

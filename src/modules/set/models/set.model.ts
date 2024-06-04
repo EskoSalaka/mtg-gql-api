@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { UUIDResolver } from 'graphql-scalars';
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { Card } from 'src/modules/card/models/card.model';
@@ -52,83 +52,83 @@ export class Set extends Model<SetAttributes, SetCreationAttributes> {
   @Field(() => UUIDResolver)
   id: string;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   object: string;
 
-  @Column
-  @Field()
+  @Column(DataType.STRING)
+  @Field(() => String)
   code: string;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.STRING)
+  @Field(() => String, { nullable: true })
   mtgo_code: string | null;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.STRING)
+  @Field(() => String, { nullable: true })
   arena_code: string | null;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.STRING)
+  @Field(() => Int, { nullable: true })
   tcgplayer_id: number | null;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   name: string;
 
-  @Column
+  @Column(DataType.STRING)
   @Field(() => SetType)
   set_type: string;
 
-  @Column
+  @Column(DataType.DATE)
   @Field()
   released_at: Date;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.STRING)
+  @Field(() => String, { nullable: true })
   block_code: string | null;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.STRING)
+  @Field(() => String, { nullable: true })
   block: string | null;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.STRING)
+  @Field(() => String, { nullable: true })
   parent_set_code: string | null;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   card_count: number;
 
-  @Column
-  @Field({ nullable: true })
+  @Column(DataType.INTEGER)
+  @Field(() => Int, { nullable: true })
   printed_size: number | null;
 
-  @Column
+  @Column(DataType.BOOLEAN)
   @Field()
   digital: boolean;
 
-  @Column
+  @Column(DataType.BOOLEAN)
   @Field()
   foil_only: boolean;
 
-  @Column
+  @Column(DataType.BOOLEAN)
   @Field()
   nonfoil_only: boolean;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   scryfall_uri: string;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   uri: string;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   icon_svg_uri: string;
 
-  @Column
+  @Column(DataType.STRING)
   @Field()
   search_uri: string;
 

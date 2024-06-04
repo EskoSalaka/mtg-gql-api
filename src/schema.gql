@@ -34,7 +34,7 @@ type Set {
   code: String!
   mtgo_code: String
   arena_code: String
-  tcgplayer_id: Float
+  tcgplayer_id: Int
   name: String!
   set_type: SetType!
   released_at: DateTime!
@@ -42,7 +42,7 @@ type Set {
   block: String
   parent_set_code: String
   card_count: Float!
-  printed_size: Float
+  printed_size: Int
   digital: Boolean!
   foil_only: Boolean!
   nonfoil_only: Boolean!
@@ -232,13 +232,13 @@ type Ruling {
 type Card {
   id: UUID!
   lang: Language
-  arena_id: Float
-  mtgo_id: Float
-  mtgo_foil_id: Float
+  arena_id: Int
+  mtgo_id: Int
+  mtgo_foil_id: Int
   multiverse_ids: [Float!]
-  tcgplayer_id: Float
-  tcgplayer_etched_id: Float
-  cardmarket_id: Float
+  tcgplayer_id: Int
+  tcgplayer_etched_id: Int
+  cardmarket_id: Int
   object: String!
   layout: Layout!
   oracle_id: String
@@ -248,12 +248,12 @@ type Card {
   uri: URL!
   all_parts: [RelatedCardInfo!]
   card_faces: [CardFace!]
-  cmc: Float
+  cmc: Int
   color_identity: [Color!]!
   color_indicator: [Color!]
   colors: [Color!]
   defense: String
-  edhrec_rank: Float
+  edhrec_rank: Int
   hand_modifier: String
   keywords: [String!]!
   legalities: Legalities
@@ -262,7 +262,7 @@ type Card {
   mana_cost: String
   name: String!
   oracle_text: String
-  penny_rank: Float
+  penny_rank: Int
   power: String
   produced_mana: [Color!]
   reserved: Boolean!
@@ -575,7 +575,7 @@ type CardFace {
   card_id: UUID!
   artist: String
   artist_id: UUID
-  cmc: Float
+  cmc: Int
   color_indicator: [Color!]
   colors: [Color!]
   defense: String
@@ -604,7 +604,7 @@ type SetHeader {
   code: String!
   mtgo_code: String
   arena_code: String
-  tcgplayer_id: Float
+  tcgplayer_id: Int
   name: String!
   set_type: SetType!
   released_at: DateTime!
@@ -612,7 +612,7 @@ type SetHeader {
   block: String
   parent_set_code: String
   card_count: Float!
-  printed_size: Float
+  printed_size: Int
   digital: Boolean!
   foil_only: Boolean!
   nonfoil_only: Boolean!
