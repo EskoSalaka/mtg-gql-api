@@ -6,8 +6,6 @@ export class GlobalExceptionFilter implements GqlExceptionFilter {
   private logger = new Logger();
 
   catch(exception: HttpException, host: ArgumentsHost) {
-    this.logger.error('excEEEEEption');
-
     if (host.getType() === 'http') {
       const ctx = host.switchToHttp();
       const response = ctx.getResponse();
