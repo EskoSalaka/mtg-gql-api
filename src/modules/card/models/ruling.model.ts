@@ -1,17 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import {
-  BelongsTo,
-  BelongsToMany,
-  Column,
-  DataType,
-  ForeignKey,
-  Index,
-  Model,
-  Table,
-} from 'sequelize-typescript';
-
+import { Column, DataType, Index, Model, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize';
-import { Card, CardRuling } from './card.model';
 
 export interface RulingAttributes {
   id: string;
@@ -35,6 +24,13 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
   @Column({
     type: DataType.UUID,
     primaryKey: true,
+    defaultValue: DataType.UUIDV4,
+  })
+  id: string;
+
+  @Index
+  @Column({
+    type: DataType.UUID,
   })
   oracle_id: string;
 
@@ -61,7 +57,4 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
   @Index
   @Field()
   comment: string;
-
-  @BelongsToMany(() => Card, () => CardRuling, 'oracle_id', 'card_id')
-  cards: Card[];
 }

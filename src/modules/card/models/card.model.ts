@@ -1,5 +1,4 @@
 import {
-  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -497,7 +496,12 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Field(() => [CardFace], { nullable: true })
   card_faces: CardFace[] | null;
 
-  @BelongsToMany(() => Ruling, () => CardRuling, 'card_id', 'oracle_id')
+  @HasMany(() => Ruling, {
+    as: 'rulings',
+    constraints: false,
+    sourceKey: 'oracle_id',
+    foreignKey: 'oracle_id',
+  })
   @Field(() => [Ruling], { nullable: true })
   rulings: Ruling[] | null;
 
@@ -508,15 +512,4 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @HasOne(() => LatestPrice)
   @Field(() => LatestPrice)
   prices: LatestPrice | null;
-}
-
-@Table
-export class CardRuling extends Model {
-  @Column({ primaryKey: true, type: DataType.UUID })
-  @ForeignKey(() => Card)
-  card_id: string;
-
-  @Column({ primaryKey: true, type: DataType.UUID })
-  @ForeignKey(() => Ruling)
-  oracle_id: string;
 }

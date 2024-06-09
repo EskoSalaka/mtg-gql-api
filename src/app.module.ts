@@ -7,7 +7,7 @@ import { SetModule } from './modules/set/set.module';
 import { HttpModule } from '@nestjs/axios';
 import { ServerUtilsModule } from './modules/server-utils/server-utils.module';
 import { CardFace } from './modules/card/models/card-face.model';
-import { Card, CardRuling } from './modules/card/models/card.model';
+import { Card } from './modules/card/models/card.model';
 import { Set } from './modules/set/models/set.model';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -85,7 +85,7 @@ import { LatestPrice, Price } from './modules/card/models/price.model';
           synchronize: config.get('DB_SYNCHRONIZE'),
           logging: (sql, timimgs) => logger.verbose(sql),
           autoLoadModels: true,
-          models: [Card, CardFace, Set, Ruling, Price, LatestPrice, CardRuling],
+          models: [Card, CardFace, Set, Ruling, Price, LatestPrice],
           repositoryMode: false,
           ssl: true,
         };
