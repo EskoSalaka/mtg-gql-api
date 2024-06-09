@@ -7,6 +7,8 @@ import { Set } from './models/set.model';
 const { fieldsList } = require('graphql-fields-list');
 import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { SetHeader } from './types/set-header';
+import { Ruling } from '../card/models/ruling.model';
+import { LatestPrice } from '../card/models/price.model';
 
 @Resolver(() => Set)
 export class SetResolver {
@@ -36,8 +38,10 @@ export class SetResolver {
 
   @ResolveField(() => [Card])
   async cards(@Parent() parent: Set, @Info() context: ExecutionContextHost) {
-    let cardAttributes = fieldsList(context, { skip: ['card_faces'] });
+    let cardAttributes = fieldsList(context, { skip: ['card_faces', 'rulings', 'prices'] });
     let cardFaceAttributes = fieldsList(context, { path: 'card_faces' });
+    let rulingAttributes = fieldsList(context, { path: 'rulings' });
+    let priceAttributes = fieldsList(context, { path: 'prices' });
 
     let set = await this.setModel.findByPk(parent.id, {
       include: [
@@ -48,6 +52,18 @@ export class SetResolver {
             {
               model: CardFace,
               attributes: cardFaceAttributes,
+              duplicating: false,
+            },
+            {
+              model: Ruling,
+              attributes: rulingAttributes,
+              duplicating: false,
+            },
+            {
+              model: LatestPrice,
+              as: 'prices',
+              attributes: priceAttributes,
+              duplicating: false,
             },
           ],
         },
