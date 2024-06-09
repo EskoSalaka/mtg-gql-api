@@ -55,7 +55,7 @@ export const cardFaceUpdateFields: Array<keyof CardFaceCreationAttributes> = [
 @ObjectType()
 export class CardFace extends Model<CardFaceAttributes, CardFaceCreationAttributes> {
   @Column({
-    type: DataType.UUID,
+    type: DataType.STRING,
     primaryKey: true,
   })
   @Field()
