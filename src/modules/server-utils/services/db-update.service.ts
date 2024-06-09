@@ -135,6 +135,7 @@ export class DBUpdateService {
         await this.cardRulingModel.bulkCreate(cardRulings, {
           logging: false,
           transaction: tx,
+          ignoreDuplicates: true,
         });
 
         this.logger.log('Inserting ruling data into database...');
