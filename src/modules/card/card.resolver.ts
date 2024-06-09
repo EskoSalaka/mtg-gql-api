@@ -1,4 +1,4 @@
-import { Args, Info, Query, Resolver } from '@nestjs/graphql';
+import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { PageInfo } from 'src/common/types/page-info.type';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
@@ -11,6 +11,7 @@ import { Logger } from '@nestjs/common';
 import { replaceKeysDeep } from './utils';
 import { Ruling } from './models/ruling.model';
 import { CardPage } from './types/CardPage.type';
+import { LatestPrice, Price } from './models/price.model';
 
 @Resolver(() => Card)
 export class CardResolver {
@@ -35,10 +36,11 @@ export class CardResolver {
   async cards(@Args() query: DefaultQueryArgs, @Info() context: ExecutionContextHost) {
     let cardAttributes = fieldsList(context, {
       path: 'rows',
-      skip: ['rows.card_faces', 'rows.rulings'],
+      skip: ['rows.card_faces', 'rows.rulings', 'rows.prices'],
     });
     let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
     let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
+    let priceAttributes = fieldsList(context, { path: 'rows.prices' });
 
     let topLevelCardAttrMap = Object.keys(Card.getAttributes()).reduce((acc, key) => {
       acc[key] = `$Card.${key}$`;
@@ -52,18 +54,31 @@ export class CardResolver {
       acc['rulings_' + key] = `$rulings.${key}$`;
       return acc;
     }, {});
+    let topLevelPriceAttrMap = Object.keys(LatestPrice.getAttributes()).reduce((acc, key) => {
+      acc['prices_' + key] = `$prices.${key}$`;
+      return acc;
+    }, {});
 
     let mergedAttrmaps = {
       ...topLevelCardAttrMap,
       ...topLevelCardFaceAttrMap,
       ...topLevelRulingAttrMap,
+      ...topLevelPriceAttrMap,
     };
     let mappedWhere = replaceKeysDeep(query.where, mergedAttrmaps);
 
     let count = await this.cardModel.count({
       distinct: true,
       where: mappedWhere as any,
-      include: [CardFace, Ruling],
+      include: [
+        CardFace,
+        Ruling,
+        {
+          model: LatestPrice,
+          as: 'prices',
+          duplicating: false,
+        },
+      ],
     });
 
     let rows = await this.cardModel.findAll({
@@ -81,6 +96,12 @@ export class CardResolver {
         {
           model: Ruling,
           attributes: rulingAttributes,
+          duplicating: false,
+        },
+        {
+          model: LatestPrice,
+          as: 'prices',
+          attributes: priceAttributes,
           duplicating: false,
         },
       ],

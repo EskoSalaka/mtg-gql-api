@@ -7,7 +7,7 @@ import { SetModule } from './modules/set/set.module';
 import { HttpModule } from '@nestjs/axios';
 import { ServerUtilsModule } from './modules/server-utils/server-utils.module';
 import { CardFace } from './modules/card/models/card-face.model';
-import { Card } from './modules/card/models/card.model';
+import { Card, CardRuling } from './modules/card/models/card.model';
 import { Set } from './modules/set/models/set.model';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -17,6 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
 import { Ruling } from './modules/card/models/ruling.model';
 import { CardModule } from './modules/card/card.module';
+import { LatestPrice, Price } from './modules/card/models/price.model';
 
 @Global()
 @Module({
@@ -79,11 +80,12 @@ import { CardModule } from './modules/card/card.module';
 
         return {
           dialect: config.get('DB_DIALECT'),
-          uri: config.get('DB_URI'),
+          ...(config.get('DB_URI') ? { uri: config.get('DB_URI') } : {}),
+          ...(config.get('DB_STORAGE') ? { storage: config.get('DB_STORAGE') } : {}),
           synchronize: config.get('DB_SYNCHRONIZE'),
           logging: (sql, timimgs) => logger.verbose(sql),
           autoLoadModels: true,
-          models: [Card, CardFace, Set, Ruling],
+          models: [Card, CardFace, Set, Ruling, Price, LatestPrice, CardRuling],
           repositoryMode: false,
           ssl: true,
         };

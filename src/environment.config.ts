@@ -77,7 +77,6 @@ export class EnvironmentVariables {
   LOG_PATH?: string = './logs/logging.log';
 
   // Database configuration
-
   @Expose()
   @IsOptional()
   @IsString()

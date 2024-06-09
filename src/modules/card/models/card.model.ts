@@ -1,4 +1,14 @@
-import { Column, DataType, ForeignKey, HasMany, Index, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  HasOne,
+  Index,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import Color from '../types/color.type';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { JSONResolver, URLResolver, UUIDResolver } from 'graphql-scalars';
@@ -10,9 +20,9 @@ import Layout from '../types/layout.type';
 import Frame from '../types/frame.type';
 import FrameEffect from '../types/frame-effect.type';
 import { Legalities } from '../types/legalities.type';
-import { Prices } from '../types/prices.type';
 import { RelatedCardInfo } from '../types/related-object.type';
 import { Ruling } from './ruling.model';
+import { LatestPrice, Price } from './price.model';
 
 export interface CardAttributes {
   //Core Card Fields
@@ -78,7 +88,7 @@ export interface CardAttributes {
   image_status: string;
   image_uris: CardImagery | null;
   oversized: boolean;
-  prices: Prices;
+  prices: Price;
   printed_name: string | null;
   printed_text: string | null;
   printed_type_line: string | null;
@@ -180,7 +190,8 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Field(() => Layout)
   layout: string;
 
-  @Column(DataType.UUID)
+  @Index
+  @Column({ type: DataType.UUID, allowNull: true })
   @Field(() => String, { nullable: true })
   oracle_id: string | null;
 
@@ -204,10 +215,6 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Column(DataType.JSONB)
   @Field(() => [RelatedCardInfo], { nullable: true })
   all_parts: RelatedCardInfo[] | null;
-
-  @HasMany(() => CardFace)
-  @Field(() => [CardFace], { nullable: true })
-  card_faces: CardFace[] | null;
 
   @Column(DataType.DECIMAL)
   @Field(() => Int, { nullable: true })
@@ -376,10 +383,6 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Field()
   oversized: boolean;
 
-  @Column(DataType.JSONB)
-  @Field(() => Prices)
-  prices: Prices;
-
   @Column(DataType.STRING)
   @Field(() => String, { nullable: true })
   printed_name: string | null;
@@ -475,10 +478,6 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Field(() => String, { nullable: true })
   watermark: string | null;
 
-  @HasMany(() => Ruling, { sourceKey: 'oracle_id', foreignKey: 'oracle_id' })
-  @Field(() => [Ruling], { nullable: true })
-  rulings: Ruling[] | null;
-
   /** 
   @Column(DataType.DATE)
   @Field({ nullable: true })
@@ -492,4 +491,32 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @Field({ nullable: true })
   'preview.source': string | null;
   */
+
+  // Associations
+  @HasMany(() => CardFace)
+  @Field(() => [CardFace], { nullable: true })
+  card_faces: CardFace[] | null;
+
+  @BelongsToMany(() => Ruling, () => CardRuling, 'card_id', 'oracle_id')
+  @Field(() => [Ruling], { nullable: true })
+  rulings: Ruling[] | null;
+
+  @HasMany(() => Price)
+  @Field(() => Price)
+  prices_history: Price[] | null;
+
+  @HasOne(() => LatestPrice)
+  @Field(() => LatestPrice)
+  prices: LatestPrice | null;
+}
+
+@Table
+export class CardRuling extends Model {
+  @Column({ primaryKey: true, type: DataType.UUID })
+  @ForeignKey(() => Card)
+  card_id: string;
+
+  @Column({ primaryKey: true, type: DataType.UUID })
+  @ForeignKey(() => Ruling)
+  oracle_id: string;
 }

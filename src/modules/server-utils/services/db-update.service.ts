@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { plainToInstance } from 'class-transformer';
 import { CardFace, cardFaceUpdateFields } from 'src/modules/card/models/card-face.model';
-import { Card, cardUpdateFields } from 'src/modules/card/models/card.model';
+import { Card, CardRuling, cardUpdateFields } from 'src/modules/card/models/card.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
@@ -12,6 +12,7 @@ import { ScryfallDataDTO } from '../DTO/scryfall-data.dto';
 import { Set, setUpdateFields } from 'src/modules/set/models/set.model';
 import { Ruling, rulingUpdateFields } from 'src/modules/card/models/ruling.model';
 import * as _ from 'lodash';
+import { LatestPrice, Price, priceUpdateFields } from 'src/modules/card/models/price.model';
 const fs = require('fs');
 
 @Injectable()
@@ -24,6 +25,9 @@ export class DBUpdateService {
     @InjectModel(Set) private setModel: typeof Set,
     @InjectModel(CardFace) private cardFaceModel: typeof CardFace,
     @InjectModel(Ruling) private rulingModel: typeof Ruling,
+    @InjectModel(Price) private priceModel: typeof Price,
+    @InjectModel(LatestPrice) private latestPriceModel: typeof LatestPrice,
+    @InjectModel(CardRuling) private cardRulingModel: typeof CardRuling,
     private db: Sequelize,
   ) {}
 
@@ -55,18 +59,6 @@ export class DBUpdateService {
           await firstValueFrom(this.http.get(bulkRulingsData.download_uri, {}))
         ).data;
         this.logger.log('Done downloading rulings data...');
-
-        rulingsJSONData = _(rulingsJSONData)
-          .groupBy('oracle_id')
-          .mapValues((rulings) =>
-            rulings.map((ruling, i) => ({
-              ...ruling,
-              id: `${ruling.oracle_id}-${i}`,
-            })),
-          )
-          .values()
-          .flatten()
-          .value();
 
         this.logger.log('Validating data...');
         let scryfallData = plainToInstance(
@@ -104,6 +96,17 @@ export class DBUpdateService {
           updateOnDuplicate: cardUpdateFields,
           transaction: tx,
         });
+
+        let cardPrices = scryfallData.cards.map((c) => c.prices).flat();
+        await this.priceModel.bulkCreate(cardPrices, {
+          logging: false,
+          transaction: tx,
+        });
+        await this.latestPriceModel.bulkCreate(cardPrices, {
+          logging: false,
+          updateOnDuplicate: priceUpdateFields,
+          transaction: tx,
+        });
         this.logger.log('Done inserting card data...');
 
         this.logger.log('Inserting card face data into database...');
@@ -123,6 +126,18 @@ export class DBUpdateService {
           transaction: tx,
         });
         this.logger.log('Done inserting ruling data...');
+
+        let rulingOracleIds = scryfallData.rulings.map((r) => r.oracle_id);
+        let cardRulings = scryfallData.cards
+          .filter((c) => rulingOracleIds.includes(c.oracle_id))
+          .map((c) => ({ oracle_id: c.oracle_id, card_id: c.id }));
+
+        await this.cardRulingModel.bulkCreate(cardRulings, {
+          logging: false,
+          transaction: tx,
+        });
+
+        this.logger.log('Inserting ruling data into database...');
       });
     } catch (error) {
       log(error);

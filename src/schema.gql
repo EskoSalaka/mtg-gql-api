@@ -179,20 +179,6 @@ enum Legality {
 }
 
 """
-An object containing daily price information for this card, including usd, 
-  usd_foil, usd_etched, eur, eur_foil, eur_etched, and tix prices, as Decimals (strings). 
-"""
-type Prices {
-  usd: String
-  usd_foil: String
-  usd_etched: String
-  eur: String
-  eur_foil: String
-  eur_etched: String
-  tix: String
-}
-
-"""
 An object describing a related card.
   
   Cards that are closely related to other cards (because they call them by name, 
@@ -223,10 +209,37 @@ type RelatedCardInfo {
 }
 
 type Ruling {
-  id: String!
   source: String!
   published_at: DateTime!
   comment: String!
+}
+
+type Price {
+  id: String!
+  card_id: UUID!
+  usd: String
+  usd_foil: String
+  usd_etched: String
+  eur: String
+  eur_foil: String
+  eur_etched: String
+  tix: String
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+type LatestPrice {
+  id: String!
+  card_id: UUID!
+  usd: String
+  usd_foil: String
+  usd_etched: String
+  eur: String
+  eur_foil: String
+  eur_etched: String
+  tix: String
+  created_at: DateTime
+  updated_at: DateTime
 }
 
 type Card {
@@ -247,7 +260,6 @@ type Card {
   scryfall_uri: URL!
   uri: URL!
   all_parts: [RelatedCardInfo!]
-  card_faces: [CardFace!]
   cmc: Int
   color_identity: [Color!]!
   color_indicator: [Color!]
@@ -289,7 +301,6 @@ type Card {
   image_status: String!
   image_uris: CardImagery
   oversized: Boolean!
-  prices: Prices!
   printed_name: String
   printed_text: String
   printed_type_line: String
@@ -312,7 +323,10 @@ type Card {
   variation_of: String
   security_stamp: String
   watermark: String
+  card_faces: [CardFace!]
   rulings: [Ruling!]
+  prices_history: Price!
+  prices: LatestPrice!
 }
 
 "\n  Scryfall archives Magic cards in 17 languages (including some unofficial languages).\n\n  Each Card object indicates its language in the lang property using an ISO-like code. When available, cards may also include their printed text in printed_name, printed_type_line, and printed_text fields.\n  \n  Please note that Oracle text is always English, per game rules. Cards printed in non-English languages are a translation of the Oracle text at the time the card was printed, but these texts do not receive errata.\n  \n  Our support for multiple languages in older sets is limited. We are expanding this data slowly over time.\n  "

@@ -1,5 +1,13 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, DataType, ForeignKey, Index, Model, Table } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Index,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 import { Card } from './card.model';
 import { UUIDResolver } from 'graphql-scalars';
 import Color from '../types/color.type';
@@ -47,7 +55,7 @@ export const cardFaceUpdateFields: Array<keyof CardFaceCreationAttributes> = [
 @ObjectType()
 export class CardFace extends Model<CardFaceAttributes, CardFaceCreationAttributes> {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     primaryKey: true,
   })
   @Field()
@@ -55,6 +63,7 @@ export class CardFace extends Model<CardFaceAttributes, CardFaceCreationAttribut
   id: string;
 
   @ForeignKey(() => Card)
+  @PrimaryKey
   @Column(DataType.UUID)
   @Field(() => UUIDResolver)
   @Index
