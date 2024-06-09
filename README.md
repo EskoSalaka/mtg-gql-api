@@ -1,5 +1,7 @@
 ## Description
 
+Status of the project: Not ready, will take a while more to figure out the database structure and the queries to fetch all the relevant data.
+
 NestJs Graphql (Apollo) server that provides data available from scryfall (https://scryfall.com/docs/api) from your own database.
 It supports both sqlite and postgres (and quite possibly some other engines too) and uses the Sequelize ORM under the hood.
 
