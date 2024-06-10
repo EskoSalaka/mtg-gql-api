@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { plainToInstance } from 'class-transformer';
 import { CardFace, cardFaceUpdateFields } from 'src/modules/card/models/card-face.model';
-import { Card, CardRuling, cardUpdateFields } from 'src/modules/card/models/card.model';
+import { Card, cardUpdateFields } from 'src/modules/card/models/card.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
@@ -27,7 +27,6 @@ export class DBUpdateService {
     @InjectModel(Ruling) private rulingModel: typeof Ruling,
     @InjectModel(Price) private priceModel: typeof Price,
     @InjectModel(LatestPrice) private latestPriceModel: typeof LatestPrice,
-    @InjectModel(CardRuling) private cardRulingModel: typeof CardRuling,
     private db: Sequelize,
   ) {}
 
@@ -120,25 +119,12 @@ export class DBUpdateService {
         this.logger.log('Done inserting card face data...');
 
         this.logger.log('Inserting ruling data into database...');
+        await this.rulingModel.truncate({ logging: false, transaction: tx });
         await this.rulingModel.bulkCreate(scryfallData.rulings as any, {
           logging: false,
-          updateOnDuplicate: rulingUpdateFields,
           transaction: tx,
         });
         this.logger.log('Done inserting ruling data...');
-
-        let rulingOracleIds = scryfallData.rulings.map((r) => r.oracle_id);
-        let cardRulings = scryfallData.cards
-          .filter((c) => rulingOracleIds.includes(c.oracle_id))
-          .map((c) => ({ oracle_id: c.oracle_id, card_id: c.id }));
-
-        await this.cardRulingModel.bulkCreate(cardRulings, {
-          logging: false,
-          transaction: tx,
-          ignoreDuplicates: true,
-        });
-
-        this.logger.log('Inserting ruling data into database...');
       });
     } catch (error) {
       log(error);
