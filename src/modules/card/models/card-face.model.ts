@@ -2,6 +2,7 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   DataType,
+  DefaultScope,
   ForeignKey,
   Index,
   Model,
@@ -50,7 +51,9 @@ export const cardFaceUpdateFields: Array<keyof CardFaceCreationAttributes> = [
   'oracle_text',
   'printed_text',
 ];
-
+@DefaultScope(() => ({
+  attributes: ['id'],
+}))
 @Table({ tableName: 'CardFaces', underscored: true, timestamps: true })
 @ObjectType()
 export class CardFace extends Model<CardFaceAttributes, CardFaceCreationAttributes> {

@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { UUIDResolver } from 'graphql-scalars';
-import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, DefaultScope, HasMany, Model, Table } from 'sequelize-typescript';
 import { Card } from 'src/modules/card/models/card.model';
 import SetType from '../types/set-type.type';
 
@@ -41,6 +41,9 @@ export const setUpdateFields: Array<keyof SetCreationAttributes> = [
   'search_uri',
 ];
 
+@DefaultScope(() => ({
+  attributes: ['id'],
+}))
 @Table({ tableName: 'Sets', underscored: true, timestamps: true })
 @ObjectType()
 export class Set extends Model<SetAttributes, SetCreationAttributes> {

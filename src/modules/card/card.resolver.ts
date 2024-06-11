@@ -34,18 +34,18 @@ export class CardResolver {
       include: [
         {
           model: CardFace,
-          attributes: [...cardFaceAttributes, 'id'],
+          attributes: cardFaceAttributes,
           duplicating: false,
         },
         {
           model: Ruling,
-          attributes: [...rulingAttributes, 'id'],
+          attributes: rulingAttributes,
           duplicating: false,
         },
         {
           model: LatestPrice,
           as: 'prices',
-          attributes: [...priceAttributes, 'id'],
+          attributes: priceAttributes,
           duplicating: false,
         },
       ],
@@ -111,18 +111,18 @@ export class CardResolver {
       include: [
         {
           model: CardFace,
-          attributes: [...cardFaceAttributes, 'id'],
+          attributes: cardFaceAttributes,
           duplicating: false,
         },
         {
           model: Ruling,
-          attributes: [...rulingAttributes, 'id'],
+          attributes: rulingAttributes,
           duplicating: false,
         },
         {
           model: LatestPrice,
           as: 'prices',
-          attributes: [...priceAttributes, 'id'],
+          attributes: priceAttributes,
           duplicating: false,
         },
       ],

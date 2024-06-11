@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { BelongsTo, Column, DataType, ForeignKey, Index, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
 
 import { Optional } from 'sequelize';
 import { Card } from './card.model';
@@ -31,7 +31,9 @@ export const priceUpdateFields: Array<keyof PriceAttributes> = [
   'tix',
   'updated_at',
 ];
-
+@DefaultScope(() => ({
+  attributes: ['id'],
+}))
 @Table({ tableName: 'Prices', underscored: true, timestamps: true })
 @ObjectType()
 export class Price extends Model<PriceAttributes, PriceCreationAttributes> {

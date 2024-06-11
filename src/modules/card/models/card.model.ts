@@ -1,6 +1,7 @@
 import {
   Column,
   DataType,
+  DefaultScope,
   ForeignKey,
   HasMany,
   HasOne,
@@ -136,7 +137,9 @@ export const cardUpdateFields: Array<keyof CardCreationAttributes> = [
   'scryfall_set_uri',
   'set_search_uri',
 ];
-
+@DefaultScope(() => ({
+  attributes: ['id'],
+}))
 @Table({ tableName: 'Cards', timestamps: true })
 @ObjectType()
 export class Card extends Model<CardAttributes, CardCreationAttributes> {

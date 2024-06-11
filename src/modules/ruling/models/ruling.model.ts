@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, DataType, HasMany, Index, Model, Table } from 'sequelize-typescript';
+import { Column, DataType, DefaultScope, HasMany, Index, Model, Table } from 'sequelize-typescript';
 import { Optional } from 'sequelize';
 import { Card } from 'src/modules/card/models/card.model';
 
@@ -19,6 +19,9 @@ export const rulingUpdateFields: Array<keyof RulingAttributes> = [
   'comment',
 ];
 
+@DefaultScope(() => ({
+  attributes: ['id'],
+}))
 @Table({ tableName: 'Rulings', underscored: true, timestamps: true })
 @ObjectType()
 export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {

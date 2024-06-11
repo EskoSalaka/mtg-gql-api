@@ -22,7 +22,7 @@ export class SetResolver {
     let selectedFields = fieldsList(context, { skip: ['cards'] });
 
     return this.setModel.findByPk(id, {
-      attributes: [...selectedFields, 'id'],
+      attributes: selectedFields,
     });
   }
 
@@ -32,7 +32,7 @@ export class SetResolver {
 
     return this.setModel.findAll({
       where: query.where,
-      attributes: [...selectedFields, 'id'],
+      attributes: selectedFields,
     });
   }
 
@@ -47,22 +47,22 @@ export class SetResolver {
       include: [
         {
           model: Card,
-          attributes: [...cardAttributes, 'id'],
+          attributes: cardAttributes,
           include: [
             {
               model: CardFace,
-              attributes: [...cardFaceAttributes, 'id'],
+              attributes: cardFaceAttributes,
               duplicating: false,
             },
             {
               model: Ruling,
-              attributes: [...rulingAttributes, 'id'],
+              attributes: rulingAttributes,
               duplicating: false,
             },
             {
               model: LatestPrice,
               as: 'prices',
-              attributes: [...priceAttributes, 'id'],
+              attributes: priceAttributes,
               duplicating: false,
             },
           ],

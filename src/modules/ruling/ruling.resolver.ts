@@ -25,7 +25,7 @@ export class RulingResolver {
     });
 
     return this.rulingModel.findByPk(id, {
-      attributes: [...rulingAttributes, 'id'],
+      attributes: rulingAttributes,
     });
   }
 
@@ -44,7 +44,7 @@ export class RulingResolver {
       limit: query.limit,
       offset: query.limit * (query.page - 1),
       where: query.where,
-      attributes: [...rulingAttributes, 'id'],
+      attributes: rulingAttributes,
     });
 
     let total_pages = Math.ceil(count / query.limit);
@@ -64,7 +64,6 @@ export class RulingResolver {
 
   @ResolveField(() => Card)
   async cards(@Parent() parent: Ruling, @Info() context: ExecutionContextHost) {
-    console.log('ruling', parent);
     let cardAttributes = fieldsList(context, {
       skip: ['card_faces', 'rulings', 'prices'],
     });
@@ -75,17 +74,17 @@ export class RulingResolver {
       include: [
         {
           model: Card,
-          attributes: [...cardAttributes, 'id'],
+          attributes: cardAttributes,
           include: [
             {
               model: CardFace,
-              attributes: [...cardFaceAttributes, 'id'],
+              attributes: cardFaceAttributes,
               duplicating: false,
             },
             {
               model: Ruling,
               as: 'rulings',
-              attributes: [...rulingSubAttributes, 'id'],
+              attributes: rulingSubAttributes,
               duplicating: false,
             },
             {
