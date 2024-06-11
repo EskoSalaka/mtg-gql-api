@@ -1,7 +1,5 @@
 ## Description
 
-Status of the project: Not ready, will take a while more to figure out the database structure and the queries to fetch all the relevant data.
-
 NestJs Graphql (Apollo) server that provides data available from scryfall (https://scryfall.com/docs/api) from your own database.
 It supports both sqlite and postgres (and quite possibly some other engines too) and uses the Sequelize ORM under the hood.
 
@@ -9,11 +7,15 @@ The database is updated by using the available bulk data from scryfall. The proj
 from scratch as well as updating the current data such as latest pricing & rulings information. With sqlite, you can
 get started and build the database with barely any setup at all
 
+### Status of the project
+
+The project is now pretty much usable for the current features. There are still a few more things to iron out.
+
 ### List of features
 
 - Create & update the database automatically by using the available bulk data from scryfall
-- Paginate Card data
-- Make complex queries to search for Cards and Sets by using a Sequelize-like JSON 'Where' filter from the client-side
+- Paginate and query data like Cards and Rulings
+- Make complex queries to search for various entities by using a Sequelize-like JSON 'Where' filter from the client-side
 
 Currently, the following scryfall mtg data and related functionalities are supported by the API:
 
@@ -21,6 +23,9 @@ Currently, the following scryfall mtg data and related functionalities are suppo
   - Card Faces
   - Rulings
 - Sets
+  - Cards
+- Rulings
+  - Cards
 
 The server comes with
 
@@ -252,9 +257,9 @@ query {
 
 ```
 
-#### Querying by attributes of card_faces and rules (and possible other future related tables) of Cards
+#### Querying by attributes of card_faces, rules and prices of Cards
 
-To query by attributes of card*faces and rules, use the similar kind of queries as above, but use the attribute name 'card_faces*<some*card_face_attribute>' and 'rulings*<some_rule_attribute>
+To query by attributes of card*faces and rules, use the similar kind of queries as above, but use the attribute name card*faces*<some*card*face_attribute>, rulings*<some*rule_attribute> and prices_eur*<some_price_name>
 
 Has a card_face that has either tougness: "0" or power: "0" (note, that the result only contains cards that HAVE card_faces):
 
@@ -314,15 +319,38 @@ query {
 
 ```
 
+Cards with the (current) 'eur' price higher than 100
+
+```
+query {
+  cards(limit: 100, page: 1, where: { prices_eur: { gte: "100" } }) {
+    page_info {
+      limit
+      page
+      total_pages
+      total_rows
+    }
+    rows {
+      id
+      set_name
+      name
+      prices {
+        eur
+      }
+    }
+  }
+}
+
+```
+
 #### Handling JSON(B) attributes
 
-Some attributes of the entities such as colors and color_identity (Arrays) and prices (JSON object) are implemented as JSONB DataType in the database.
+Some attributes of the entities such as colors and color_identity (Arrays) are implemented as JSONB DataType in the database.
 
 --In sqlite --
 You must query them as strings. This means that for example
 
 - colors is a string like '["R","W"]'
-- prices is string like "prices": '{"usd": "12.27", "eur": "2.62", ...}',
 
 Example:
 
@@ -383,8 +411,6 @@ query {
 }
 
 ```
-
-#TODO: Need to support queries like searcing for prices and other JSON object fields with gte, lte, etc.
 
 ## License
 
