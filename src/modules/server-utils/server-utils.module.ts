@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { HttpModule } from '@nestjs/axios';
 import { DBUpdateService } from './services/db-update.service';
 import { SetModule } from '../set/set.module';
@@ -10,9 +9,10 @@ import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './filters/global-exception-filter';
 import { GQLReqLoggingPlugin } from './plugings/gqlLogger';
 import { CardModule } from '../card/card.module';
+import { RulingModule } from '../ruling/ruling.module';
 
 @Module({
-  imports: [SetModule, CardModule, SequelizeModule.forFeature(), TerminusModule, HttpModule],
+  imports: [SetModule, CardModule, RulingModule, TerminusModule, HttpModule],
   providers: [
     DBUpdateService,
     GQLReqLoggingPlugin,

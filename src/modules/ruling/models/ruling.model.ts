@@ -26,12 +26,14 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
     primaryKey: true,
     defaultValue: DataType.UUIDV4,
   })
+  @Field(() => String)
   id: string;
 
   @Index
   @Column({
     type: DataType.UUID,
   })
+  @Field(() => String)
   oracle_id: string;
 
   @Column({
@@ -39,7 +41,7 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
     allowNull: false,
   })
   @Index
-  @Field()
+  @Field(() => String)
   source: string;
 
   @Column({
@@ -47,7 +49,7 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
     allowNull: false,
   })
   @Index
-  @Field()
+  @Field(() => Date)
   published_at: Date;
 
   @Column({
@@ -55,6 +57,6 @@ export class Ruling extends Model<RulingAttributes, RulingCreationAttributes> {
     allowNull: false,
   })
   @Index
-  @Field()
+  @Field(() => String)
   comment: string;
 }

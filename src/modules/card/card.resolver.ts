@@ -9,9 +9,9 @@ const { fieldsList } = require('graphql-fields-list');
 import * as _ from 'lodash';
 import { Logger } from '@nestjs/common';
 import { replaceKeysDeep } from './utils';
-import { Ruling } from './models/ruling.model';
+import { Ruling } from '../ruling/models/ruling.model';
 import { CardPage } from './types/CardPage.type';
-import { LatestPrice, Price } from './models/price.model';
+import { LatestPrice } from './models/price.model';
 
 @Resolver(() => Card)
 export class CardResolver {

@@ -10,9 +10,9 @@ import { Sequelize } from 'sequelize-typescript';
 import { validate } from 'class-validator';
 import { ScryfallDataDTO } from '../DTO/scryfall-data.dto';
 import { Set, setUpdateFields } from 'src/modules/set/models/set.model';
-import { Ruling, rulingUpdateFields } from 'src/modules/card/models/ruling.model';
 import * as _ from 'lodash';
 import { LatestPrice, Price, priceUpdateFields } from 'src/modules/card/models/price.model';
+import { Ruling } from 'src/modules/ruling/models/ruling.model';
 const fs = require('fs');
 
 @Injectable()

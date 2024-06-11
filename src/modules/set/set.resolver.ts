@@ -7,7 +7,7 @@ import { Set } from './models/set.model';
 const { fieldsList } = require('graphql-fields-list');
 import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { SetHeader } from './types/set-header';
-import { Ruling } from '../card/models/ruling.model';
+import { Ruling } from '../ruling/models/ruling.model';
 import { LatestPrice } from '../card/models/price.model';
 
 @Resolver(() => Set)

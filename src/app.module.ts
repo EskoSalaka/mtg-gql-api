@@ -15,9 +15,10 @@ import { APP_PIPE } from '@nestjs/core';
 import { SequelizeLoggerService } from './sequelize-logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
-import { Ruling } from './modules/card/models/ruling.model';
+import { Ruling } from './modules/ruling/models/ruling.model';
 import { CardModule } from './modules/card/card.module';
 import { LatestPrice, Price } from './modules/card/models/price.model';
+import { RulingModule } from './modules/ruling/ruling.module';
 
 @Global()
 @Module({
@@ -83,7 +84,11 @@ import { LatestPrice, Price } from './modules/card/models/price.model';
           ...(config.get('DB_URI') ? { uri: config.get('DB_URI') } : {}),
           ...(config.get('DB_STORAGE') ? { storage: config.get('DB_STORAGE') } : {}),
           synchronize: config.get('DB_SYNCHRONIZE'),
-          logging: (sql, timimgs) => logger.verbose(sql),
+          benchmark: true,
+          logging: (sql, timimgs) => {
+            logger.verbose(sql);
+            logger.verbose('Benchmark: ' + timimgs + 'ms');
+          },
           autoLoadModels: true,
           models: [Card, CardFace, Set, Ruling, Price, LatestPrice],
           repositoryMode: false,
@@ -114,6 +119,7 @@ import { LatestPrice, Price } from './modules/card/models/price.model';
     HttpModule,
     CardModule,
     SetModule,
+    RulingModule,
   ],
   controllers: [],
   providers: [

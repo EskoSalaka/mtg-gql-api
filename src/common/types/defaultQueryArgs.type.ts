@@ -39,16 +39,3 @@ export class WhereQueryArgs extends DefaultQueryArgs {
   @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
   where: WhereOptions;
 }
-
-@ArgsType()
-export class CardsQueryArgs {
-  @Field(() => JSONObjectResolver, { nullable: true })
-  @Allow()
-  @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
-  card: WhereOptions;
-
-  @Field(() => JSONObjectResolver, { nullable: true })
-  @Allow()
-  @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
-  card_face: WhereOptions;
-}

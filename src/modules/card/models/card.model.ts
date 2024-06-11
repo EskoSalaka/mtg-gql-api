@@ -20,7 +20,7 @@ import Frame from '../types/frame.type';
 import FrameEffect from '../types/frame-effect.type';
 import { Legalities } from '../types/legalities.type';
 import { RelatedCardInfo } from '../types/related-object.type';
-import { Ruling } from './ruling.model';
+import { Ruling } from '../../ruling/models/ruling.model';
 import { LatestPrice, Price } from './price.model';
 
 export interface CardAttributes {

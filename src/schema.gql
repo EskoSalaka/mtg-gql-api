@@ -209,6 +209,8 @@ type RelatedCardInfo {
 }
 
 type Ruling {
+  id: String!
+  oracle_id: String!
   source: String!
   published_at: DateTime!
   comment: String!
@@ -649,11 +651,17 @@ type CardPage {
   page_info: PageInfo!
 }
 
+type RulingPage {
+  rows: [Ruling!]!
+  page_info: PageInfo!
+}
+
 type Query {
   set(id: String!): Set!
   sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
+  rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingPage!
 }
 
 """
