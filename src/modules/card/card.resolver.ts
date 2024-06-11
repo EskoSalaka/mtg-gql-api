@@ -24,12 +24,11 @@ export class CardResolver {
   @Query(() => Card)
   async card(@Args('id') id: string, @Info() context: ExecutionContextHost) {
     let cardAttributes = fieldsList(context, {
-      path: 'rows',
-      skip: ['rows.card_faces', 'rows.rulings', 'rows.prices'],
+      skip: ['card_faces', 'rulings', 'prices'],
     });
-    let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
-    let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
-    let priceAttributes = fieldsList(context, { path: 'rows.prices' });
+    let cardFaceAttributes = fieldsList(context, { path: 'card_faces' });
+    let rulingAttributes = fieldsList(context, { path: 'rulings' });
+    let priceAttributes = fieldsList(context, { path: 'prices' });
 
     return this.cardModel.findByPk(id, {
       include: [
