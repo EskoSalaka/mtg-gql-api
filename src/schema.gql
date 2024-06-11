@@ -214,6 +214,7 @@ type Ruling {
   source: String!
   published_at: DateTime!
   comment: String!
+  cards: [Card!]
 }
 
 type Price {
@@ -651,8 +652,16 @@ type CardPage {
   page_info: PageInfo!
 }
 
-type RulingPage {
-  rows: [Ruling!]!
+type RulingHeader {
+  id: String!
+  oracle_id: String!
+  source: String!
+  published_at: DateTime!
+  comment: String!
+}
+
+type RulingHeaderPage {
+  rows: [RulingHeader!]!
   page_info: PageInfo!
 }
 
@@ -662,7 +671,7 @@ type Query {
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
   ruling(id: String!): Ruling!
-  rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingPage!
+  rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingHeaderPage!
 }
 
 """

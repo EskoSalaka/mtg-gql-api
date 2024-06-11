@@ -1,11 +1,14 @@
-import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { InjectModel } from '@nestjs/sequelize';
 const { fieldsList } = require('graphql-fields-list');
 import { Ruling } from '../ruling/models/ruling.model';
-import { RulingPage } from './types/rulings-page';
+import { RulingHeaderPage } from './types/rulings-page';
 import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import type { PageInfo } from 'src/common/types/page-info.type';
+import { Card } from '../card/models/card.model';
+import { CardFace } from '../card/models/card-face.model';
+import { LatestPrice } from '../card/models/price.model';
 
 @Resolver(() => Ruling)
 export class RulingResolver {
@@ -16,14 +19,47 @@ export class RulingResolver {
 
   @Query(() => Ruling)
   async ruling(@Args('id') id: string, @Info() context: ExecutionContextHost) {
-    const rulingAttributes = fieldsList(context);
+    const rulingAttributes = fieldsList(context, {
+      skip: ['cards'],
+    });
+    let cardAttributes = fieldsList(context, {
+      path: 'cards',
+      skip: ['cards.card_faces', 'cards.rulings', 'cards.prices'],
+    });
+
+    let cardFaceAttributes = fieldsList(context, { path: 'cards.card_faces' });
+    let rulingSubAttributes = fieldsList(context, { path: 'cards.rulings' });
 
     return this.rulingModel.findByPk(id, {
       attributes: rulingAttributes,
+      include: [
+        {
+          model: Card,
+          attributes: cardAttributes,
+          as: 'cards',
+          include: [
+            {
+              model: CardFace,
+              attributes: cardFaceAttributes,
+              duplicating: false,
+            },
+            {
+              model: Ruling,
+              attributes: rulingSubAttributes,
+              duplicating: false,
+            },
+            {
+              model: LatestPrice,
+              as: 'prices',
+              duplicating: false,
+            },
+          ],
+        },
+      ],
     });
   }
 
-  @Query(() => RulingPage)
+  @Query(() => RulingHeaderPage)
   async rulings(@Args() query: DefaultQueryArgs, @Info() context: ExecutionContextHost) {
     const rulingAttributes = fieldsList(context, {
       path: 'rows',
