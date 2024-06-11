@@ -1,14 +1,15 @@
-import { Args, Info, Query, Resolver } from '@nestjs/graphql';
+import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { InjectModel } from '@nestjs/sequelize';
 const { fieldsList } = require('graphql-fields-list');
 import { Ruling } from '../ruling/models/ruling.model';
 import { RulingHeaderPage } from './types/rulings-page';
-import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
+import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import type { PageInfo } from 'src/common/types/page-info.type';
 import { Card } from '../card/models/card.model';
 import { CardFace } from '../card/models/card-face.model';
 import { LatestPrice } from '../card/models/price.model';
+import _ from 'lodash';
 
 @Resolver(() => Ruling)
 export class RulingResolver {
@@ -22,40 +23,9 @@ export class RulingResolver {
     const rulingAttributes = fieldsList(context, {
       skip: ['cards'],
     });
-    let cardAttributes = fieldsList(context, {
-      path: 'cards',
-      skip: ['cards.card_faces', 'cards.rulings', 'cards.prices'],
-    });
-
-    let cardFaceAttributes = fieldsList(context, { path: 'cards.card_faces' });
-    let rulingSubAttributes = fieldsList(context, { path: 'cards.rulings' });
 
     return this.rulingModel.findByPk(id, {
-      attributes: rulingAttributes,
-      include: [
-        {
-          model: Card,
-          attributes: cardAttributes,
-          as: 'cards',
-          include: [
-            {
-              model: CardFace,
-              attributes: cardFaceAttributes,
-              duplicating: false,
-            },
-            {
-              model: Ruling,
-              attributes: rulingSubAttributes,
-              duplicating: false,
-            },
-            {
-              model: LatestPrice,
-              as: 'prices',
-              duplicating: false,
-            },
-          ],
-        },
-      ],
+      attributes: [...rulingAttributes, 'id'],
     });
   }
 
@@ -74,7 +44,7 @@ export class RulingResolver {
       limit: query.limit,
       offset: query.limit * (query.page - 1),
       where: query.where,
-      attributes: rulingAttributes,
+      attributes: [...rulingAttributes, 'id'],
     });
 
     let total_pages = Math.ceil(count / query.limit);
@@ -90,5 +60,44 @@ export class RulingResolver {
       rows,
       page_info,
     };
+  }
+
+  @ResolveField(() => Card)
+  async cards(@Parent() parent: Ruling, @Info() context: ExecutionContextHost) {
+    console.log('ruling', parent);
+    let cardAttributes = fieldsList(context, {
+      skip: ['card_faces', 'rulings', 'prices'],
+    });
+    let cardFaceAttributes = fieldsList(context, { path: 'card_faces' });
+    let rulingSubAttributes = fieldsList(context, { path: 'rulings' });
+
+    let ruling = await this.rulingModel.findByPk(parent.id, {
+      include: [
+        {
+          model: Card,
+          attributes: [...cardAttributes, 'id'],
+          include: [
+            {
+              model: CardFace,
+              attributes: [...cardFaceAttributes, 'id'],
+              duplicating: false,
+            },
+            {
+              model: Ruling,
+              as: 'rulings',
+              attributes: [...rulingSubAttributes, 'id'],
+              duplicating: false,
+            },
+            {
+              model: LatestPrice,
+              as: 'prices',
+              duplicating: false,
+            },
+          ],
+        },
+      ],
+    });
+
+    return ruling.cards;
   }
 }
