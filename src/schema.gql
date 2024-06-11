@@ -661,6 +661,7 @@ type Query {
   sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
+  ruling(id: String!): Ruling!
   rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingPage!
 }
 

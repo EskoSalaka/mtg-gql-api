@@ -14,6 +14,15 @@ export class RulingResolver {
     private rulingModel: typeof Ruling,
   ) {}
 
+  @Query(() => Ruling)
+  async ruling(@Args('id') id: string, @Info() context: ExecutionContextHost) {
+    const rulingAttributes = fieldsList(context);
+
+    return this.rulingModel.findByPk(id, {
+      attributes: rulingAttributes,
+    });
+  }
+
   @Query(() => RulingPage)
   async rulings(@Args() query: DefaultQueryArgs, @Info() context: ExecutionContextHost) {
     const rulingAttributes = fieldsList(context, {
