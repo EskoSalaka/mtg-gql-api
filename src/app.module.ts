@@ -12,7 +12,6 @@ import { Set } from './modules/set/models/set.model';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { APP_PIPE } from '@nestjs/core';
-import { SequelizeLoggerService } from './sequelize-logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
 import { Ruling } from './modules/ruling/models/ruling.model';
@@ -125,7 +124,6 @@ import { RulingModule } from './modules/ruling/ruling.module';
   providers: [
     SequelizeModule,
     Logger,
-    SequelizeLoggerService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({

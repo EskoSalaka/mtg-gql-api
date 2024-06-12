@@ -10,7 +10,13 @@ export class GQLReqLoggingPlugin implements ApolloServerPlugin {
     let logger = this.logger;
 
     if (requestContext.request.operationName !== 'IntrospectionQuery') {
-      logger.debug('GQL req received: \n' + requestContext?.request?.query);
+      logger.debug(
+        'GQL req received. OperationName: ' +
+          requestContext.request.operationName +
+          '\n' +
+          requestContext?.request?.query,
+      );
+      logger.debug('GQL req variables: ' + JSON.stringify(requestContext?.request?.variables));
     }
 
     return {

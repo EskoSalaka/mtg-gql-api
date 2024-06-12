@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { log } from 'console';
-import { DBUpdateService } from './modules/server-utils/services/db-update.service';
+import { AppModule } from 'src/app.module';
+import { DBUpdateService } from 'src/modules/server-utils/services/db-update.service';
 
 async function bootstrap() {
   log('Starting database update...');
