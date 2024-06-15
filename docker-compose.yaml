@@ -1,0 +1,25 @@
+services:
+  mtg-gql-api:
+    build: .
+
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+
+    
+    volumes:
+      - ./db-data:/var/lib/mtg-gql-api # Persist the database
+      - ./logs:/var/log/mtg-gql-api # Persist the logs
+
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LOG_LEVEL=verbose
+      - LOG_TRANSPORTS=console,file
+      - LOG_PATH=/var/log/mtg-gql-api
+      - LOG_MAX_SIZE=50000000
+      - LOG_MAX_FILES=10
+      - DB_DIALECT=sqlite
+      - DB_URI=sqlite:///var/lib/mtg-gql-api/database.sqlite
+      - DB_SYNCHRONIZE=true
+      
+

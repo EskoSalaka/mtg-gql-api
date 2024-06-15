@@ -1,0 +1,8 @@
+# Node.js
+node_modules
+dist
+logs
+.data
+db-data
+.env
+npm-debug.log

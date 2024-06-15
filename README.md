@@ -58,8 +58,14 @@ The server uses 'dotenv' under the hood. To get started quickly, create a '.env'
 
 #### Using sqlite
 
-Fill in the 'DB_STORAGE' variable (for example .data/mydb.sqlite) to set path of the sqlite storage and set
-'DB_SYNCHRONIZE=true' . When you start the project, a database will automatically generated. When 'DB_SYNCHRONIZE=true' also any changes to the schema are applied automatically when possible.
+Set the environment variables
+
+```
+DB_DIALECT="sqlite"
+DB_URI="sqlite://db-data/database.sqlite" # Or wherever your database is
+```
+
+When DB_SYNCHRONIZE=true also any changes to the schema are applied automatically when possible.
 
 Then, just run the script which should fetch the bulk data from scryfall and update the database. Also starting the server with no database will automatically create a new one in the provided path
 
@@ -71,9 +77,14 @@ $ npm run update-db
 
 For postgres, you first need to install a postgres server or use an existing one. For local setup, you can download it here https://www.postgresql.org/download/. Then you need to create a fresh database.
 
-Set
-'DB_DIALECT="postgres"' and
-'DB_URI="postgresql://myUser:myPassword@localhost:5432/myDatabaseName"
+Set the environment variables
+
+```
+DB_DIALECT="postgres"
+DB_URI="postgresql://myUser:myPassword@localhost:5432/myDatabaseName"
+```
+
+When DB_SYNCHRONIZE=true also any changes to the schema are applied automatically when possible.
 
 Then, just run the script which should fetch the bulk data from scryfall and update the database. With postgres, you will need to create a database first, but running the app or the update script should create
 all the required tables
@@ -419,4 +430,12 @@ query {
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+[MIT licensed](LICENSE).
+
+## Disclaimer and notes
+
+This project is not endorsed by Wizards of the Coast, Scryfall or any other party.
+
+This is a hobby project with the primary purpose of learning and providing tools to create additional Magic: the Gathering software, performing research and creating community content.
+
+The project is free and open-source. No content shall be locked behind a login except for the purpose of users accessing their own resources like Decks and Admins performing server maintenance tasks.
