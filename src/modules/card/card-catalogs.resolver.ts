@@ -19,7 +19,7 @@ export class CardCatalogResolver {
     let result = await this.cardModel.unscoped().findAndCountAll({
       distinct: true,
       col: 'name',
-      attributes: [[Sequelize.literal('DISTINCT `name`'), 'name']],
+      attributes: [[Sequelize.literal('DISTINCT name'), 'name']],
       order: [['name', 'ASC']],
     });
 
@@ -31,7 +31,7 @@ export class CardCatalogResolver {
     let result = await this.cardModel.unscoped().findAndCountAll({
       distinct: true,
       col: 'watermark',
-      attributes: [[Sequelize.literal('DISTINCT `watermark`'), 'watermark']],
+      attributes: [[Sequelize.literal('DISTINCT watermark'), 'watermark']],
       order: [['watermark', 'ASC']],
       where: {
         watermark: {
@@ -48,10 +48,10 @@ export class CardCatalogResolver {
     let result = await this.cardModel.unscoped().findAndCountAll({
       distinct: true,
       col: 'artist',
-      attributes: [[Sequelize.literal('DISTINCT `artist`'), 'artist']],
+      attributes: [[Sequelize.literal('DISTINCT artist'), 'artist']],
       order: [['artist', 'ASC']],
       where: {
-        [Op.and]: [Sequelize.literal('`artist` IS NOT NULL'), Sequelize.literal('`artist` != ""')],
+        [Op.and]: [Sequelize.literal('artist IS NOT NULL'), Sequelize.literal(`artist <> ''`)],
       },
     });
 
@@ -61,7 +61,7 @@ export class CardCatalogResolver {
   @Query(() => CatalogResult)
   async card_full_basic_types() {
     let result = await this.cardModel.unscoped().findAll({
-      attributes: [[Sequelize.literal('DISTINCT `type_line`'), 'type_line']],
+      attributes: [[Sequelize.literal('DISTINCT type_line'), 'type_line']],
       order: [['type_line', 'ASC']],
       where: {
         type_line: {
@@ -90,7 +90,7 @@ export class CardCatalogResolver {
   @Query(() => CatalogResult)
   async card_full_types() {
     let result = await this.cardModel.unscoped().findAll({
-      attributes: [[Sequelize.literal('DISTINCT `type_line`'), 'type_line']],
+      attributes: [[Sequelize.literal('DISTINCT type_line'), 'type_line']],
       order: [['type_line', 'ASC']],
       where: {
         type_line: {
@@ -125,7 +125,7 @@ export class CardCatalogResolver {
     let result = await this.cardModel.unscoped().findAndCountAll({
       distinct: true,
       col: 'power',
-      attributes: [[Sequelize.literal('DISTINCT `power`'), 'power']],
+      attributes: [[Sequelize.literal('DISTINCT power'), 'power']],
       order: [['power', 'ASC']],
       where: {
         power: {
@@ -142,7 +142,7 @@ export class CardCatalogResolver {
     let result = await this.cardModel.unscoped().findAndCountAll({
       distinct: true,
       col: 'toughness',
-      attributes: [[Sequelize.literal('DISTINCT `toughness`'), 'toughness']],
+      attributes: [[Sequelize.literal('DISTINCT toughness'), 'toughness']],
       order: [['toughness', 'ASC']],
       where: {
         toughness: {
@@ -159,7 +159,7 @@ export class CardCatalogResolver {
     let result = await this.cardModel.unscoped().findAndCountAll({
       distinct: true,
       col: 'loyalty',
-      attributes: [[Sequelize.literal('DISTINCT `loyalty`'), 'loyalty']],
+      attributes: [[Sequelize.literal('DISTINCT loyalty'), 'loyalty']],
       order: [['loyalty', 'ASC']],
       where: {
         loyalty: {
