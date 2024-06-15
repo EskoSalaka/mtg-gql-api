@@ -50,9 +50,16 @@ export class EnvironmentVariables {
   NODE_ENV: Environment = Environment.Development;
 
   @Expose()
+  @IsOptional()
+  @IsBoolean({})
+  @Transform(({ value }) => value === 'true' || value === '1')
+  APOLLO_PLAYGROUND: boolean = true;
+
+  @Expose()
   @IsNumber()
   @Min(0)
   @Max(65535)
+  @Transform(({ value }) => parseInt(value))
   PORT: number = 3000;
 
   // Logging configuration
@@ -74,7 +81,19 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsString()
   @ValidateIf((o) => o.LOG_TRANSPORTS?.includes('file'))
-  LOG_PATH?: string = './logs/logging.log';
+  LOG_PATH?: string = './logs';
+
+  @Expose()
+  @IsNumber()
+  @Min(0)
+  @Transform(({ value }) => parseInt(value))
+  LOG_MAX_SIZE: number = 50000000;
+
+  @Expose()
+  @IsNumber()
+  @Min(0)
+  @Transform(({ value }) => parseInt(value))
+  LOG_MAX_FILES: number = 10;
 
   // Database configuration
   @Expose()
@@ -86,22 +105,17 @@ export class EnvironmentVariables {
   @Expose()
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === '1')
   DB_SYNCHRONIZE: boolean = false;
 
   @Expose()
   @IsOptional()
   @IsString()
   DB_URI: string;
-
-  @Expose()
-  @IsOptional()
-  @IsString()
-  DB_STORAGE: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>) {
   const validatedConfig = plainToInstance(EnvironmentVariables, config, {
-    enableImplicitConversion: true,
     excludeExtraneousValues: true,
     exposeDefaultValues: true,
   });

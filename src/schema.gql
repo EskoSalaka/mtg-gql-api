@@ -671,8 +671,6 @@ type RulingHeaderPage {
 }
 
 type Query {
-  set(id: String!): Set!
-  sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
   card_names: CatalogResult!
@@ -683,6 +681,8 @@ type Query {
   card_powers: CatalogResult!
   card_toughnesses: CatalogResult!
   card_loyalties: CatalogResult!
+  set(id: String!): Set!
+  sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
   ruling(id: String!): Ruling!
   rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingHeaderPage!
 }

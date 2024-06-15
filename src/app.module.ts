@@ -34,7 +34,10 @@ import { RulingModule } from './modules/ruling/ruling.module';
           transports.push(
             new winston.transports.File({
               level: config.get('LOG_LEVEL'),
-              filename: config.get('LOG_PATH'),
+              dirname: config.get('LOG_PATH'),
+              filename: 'mtg-gql.log',
+              maxsize: config.get('LOG_MAX_SIZE'),
+              maxFiles: config.get('LOG_MAX_FILES'),
               handleExceptions: true,
               format: winston.format.combine(
                 winston.format.timestamp(),
@@ -80,8 +83,8 @@ import { RulingModule } from './modules/ruling/ruling.module';
 
         return {
           dialect: config.get('DB_DIALECT'),
-          ...(config.get('DB_URI') ? { uri: config.get('DB_URI') } : {}),
-          ...(config.get('DB_STORAGE') ? { storage: config.get('DB_STORAGE') } : {}),
+          dialectModule: config.get('DB_DIALECT') === 'sqlite' ? require('sqlite3') : require('pg'),
+          uri: config.get('DB_URI'),
           synchronize: config.get('DB_SYNCHRONIZE'),
           benchmark: true,
           logging: (sql, timimgs) => {
@@ -96,33 +99,36 @@ import { RulingModule } from './modules/ruling/ruling.module';
       },
       inject: [ConfigService],
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync({
       driver: ApolloDriver,
-      autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-      formatError: (error) => {
-        const originalError = error.extensions?.originalError as Error;
+      imports: [],
+      useFactory: async (config: ConfigService<EnvironmentVariables>) => ({
+        autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
+        playground: config.get('APOLLO_PLAYGROUND'),
+        formatError: (error) => {
+          const originalError = error.extensions?.originalError as Error;
 
-        if (!originalError) {
+          if (!originalError) {
+            return {
+              message: error.message,
+              code: error.extensions?.code,
+            };
+          }
           return {
-            message: error.message,
+            message: originalError.message,
             code: error.extensions?.code,
           };
-        }
-        return {
-          message: originalError.message,
-          code: error.extensions?.code,
-        };
-      },
+        },
+      }),
+      inject: [ConfigService],
     }),
-    ServerUtilsModule,
-    HttpModule,
     CardModule,
     SetModule,
     RulingModule,
+    ServerUtilsModule,
   ],
   controllers: [],
   providers: [
-    SequelizeModule,
     Logger,
     {
       provide: APP_PIPE,

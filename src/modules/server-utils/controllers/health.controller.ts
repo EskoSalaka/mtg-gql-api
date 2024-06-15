@@ -1,16 +1,26 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, SequelizeHealthIndicator } from '@nestjs/terminus';
+import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
+import { Sequelize } from 'sequelize-typescript';
 
 @Controller('health')
 export class HealthController {
   constructor(
     private health: HealthCheckService,
-    private dbHealth: SequelizeHealthIndicator,
+    private sequelize: Sequelize,
   ) {}
 
   @Get()
   @HealthCheck()
-  check() {
-    return this.health.check([() => this.dbHealth.pingCheck('database')]);
+  async check() {
+    let sequelizeStatus;
+
+    try {
+      await this.sequelize.authenticate();
+      sequelizeStatus = 'up';
+    } catch (e) {
+      sequelizeStatus = 'down';
+    }
+
+    return this.health.check([async () => ({ sequelize: { status: sequelizeStatus } })]);
   }
 }
