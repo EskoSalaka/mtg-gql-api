@@ -26,6 +26,11 @@ Currently, the following scryfall mtg data and related functionalities are suppo
   - Cards
 - Rulings
   - Cards
+- Catalogs (similar to what scryfall server)
+  - Card names
+  - Card powers
+  - Card touhnesses
+  - etc.
 
 The server comes with
 
