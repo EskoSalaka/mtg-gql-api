@@ -7,19 +7,14 @@ import { CardFace } from './models/card-face.model';
 import { Card } from './models/card.model';
 import { CardResolver } from './card.resolver';
 import { LatestPrice, Price } from './models/price.model';
+import { CardCatalogResolver } from './card-catalogs.resolver';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Card, CardFace, Set, Ruling, Price, LatestPrice], {
-      models: [Card, CardFace, Set, Ruling, LatestPrice],
-      logging(sql, timing) {
-        let logger = new Logger('Sequelize');
-        logger.debug(sql, 'Sequelize');
-      },
-    }),
+    SequelizeModule.forFeature([Card, CardFace, Set, Ruling, Price, LatestPrice], {}),
     HttpModule,
   ],
-  providers: [CardResolver, Logger],
+  providers: [CardResolver, Logger, CardCatalogResolver],
   exports: [SequelizeModule],
 })
 export class CardModule {}

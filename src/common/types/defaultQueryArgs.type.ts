@@ -27,7 +27,6 @@ export class DefaultQueryArgs {
   @Field(() => JSONObjectResolver, { nullable: true })
   @Allow()
   @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
-  @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
   where: WhereOptions;
 }
 
@@ -35,7 +34,6 @@ export class DefaultQueryArgs {
 export class WhereQueryArgs extends DefaultQueryArgs {
   @Field(() => JSONObjectResolver, { nullable: true })
   @Allow()
-  @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
   @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)
   where: WhereOptions;
 }

@@ -652,6 +652,11 @@ type CardPage {
   page_info: PageInfo!
 }
 
+type CatalogResult {
+  rows: [String!]!
+  total_rows: Int!
+}
+
 type RulingHeader {
   id: String!
   oracle_id: String!
@@ -670,6 +675,14 @@ type Query {
   sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
+  card_names: CatalogResult!
+  card_watermarks: CatalogResult!
+  card_artist_names: CatalogResult!
+  card_full_basic_types: CatalogResult!
+  card_full_types: CatalogResult!
+  card_powers: CatalogResult!
+  card_toughnesses: CatalogResult!
+  card_loyalties: CatalogResult!
   ruling(id: String!): Ruling!
   rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingHeaderPage!
 }
