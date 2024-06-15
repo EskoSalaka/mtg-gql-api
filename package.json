@@ -31,8 +31,6 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/sequelize": "^10.0.1",
     "@nestjs/terminus": "^10.2.3",
-    "@sequelize/postgres": "^7.0.0-alpha.41",
-    "@sequelize/sqlite3": "^7.0.0-alpha.41",
     "axios": "^1.7.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
