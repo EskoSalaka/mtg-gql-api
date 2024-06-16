@@ -386,6 +386,7 @@ export class CardDTO {
   set_uri: string;
 
   @Expose({ name: 'set' })
+  @IsString()
   set_code: string;
 
   @Expose()

@@ -445,8 +445,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   set_uri: string;
 
   @Column({
-    type: DataType.UUID,
-    field: 'set',
+    type: DataType.STRING,
   })
   @Field()
   set_code: string;
