@@ -167,3 +167,64 @@ query card_loyalties {
   }
 }
 ```
+
+## Symbology
+
+```graphql
+query symbology {
+  symbology {
+    total_rows
+    rows {
+      id
+      symbol
+      hybrid
+      english
+      svg_uri
+      colors
+      object
+      appears_in_mana_costs
+      transposable
+      gatherer_alternates
+      phyrexian
+    }
+  }
+}
+
+query symbologyExampleSqlite1 {
+  symbology(where: { colors: { like: "%W%" } }) {
+    total_rows
+    rows {
+      id
+      symbol
+      hybrid
+      english
+      svg_uri
+      colors
+      object
+      appears_in_mana_costs
+      transposable
+      gatherer_alternates
+      phyrexian
+    }
+  }
+}
+
+query symbologyExampleSqlite2 {
+  symbology(where: { symbol: "{R}" }) {
+    total_rows
+    rows {
+      id
+      symbol
+      hybrid
+      english
+      svg_uri
+      colors
+      object
+      appears_in_mana_costs
+      transposable
+      gatherer_alternates
+      phyrexian
+    }
+  }
+}
+```

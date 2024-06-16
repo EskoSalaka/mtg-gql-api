@@ -13,6 +13,8 @@ import { Set, setUpdateFields } from 'src/modules/set/models/set.model';
 import * as _ from 'lodash';
 import { LatestPrice, Price, priceUpdateFields } from 'src/modules/card/models/price.model';
 import { Ruling } from 'src/modules/ruling/models/ruling.model';
+import { Symbology } from 'src/modules/symbology/models/symbology.model';
+import type { Transaction } from 'sequelize';
 const fs = require('fs');
 
 @Injectable()
@@ -27,6 +29,7 @@ export class DBUpdateService {
     @InjectModel(Ruling) private rulingModel: typeof Ruling,
     @InjectModel(Price) private priceModel: typeof Price,
     @InjectModel(LatestPrice) private latestPriceModel: typeof LatestPrice,
+    @InjectModel(Symbology) private symbologyModel: typeof Symbology,
     private db: Sequelize,
   ) {}
 
@@ -62,7 +65,11 @@ export class DBUpdateService {
         this.logger.log('Validating data...');
         let scryfallData = plainToInstance(
           ScryfallDataDTO,
-          { cards: cardsJSONData, sets: setsJSONData, rulings: rulingsJSONData },
+          {
+            cards: cardsJSONData,
+            sets: setsJSONData,
+            rulings: rulingsJSONData,
+          },
           {
             excludeExtraneousValues: true,
             exposeUnsetFields: true,
@@ -125,6 +132,8 @@ export class DBUpdateService {
           transaction: tx,
         });
         this.logger.log('Done inserting ruling data...');
+
+        await this.updateSymbology(tx);
       });
     } catch (error) {
       log(error);
@@ -133,6 +142,53 @@ export class DBUpdateService {
     } finally {
       this.logger.log('Update complete');
       this.logger.log('--------------------------------------------------------------');
+    }
+  }
+
+  async updateSymbology(transaction?: Transaction) {
+    this.logger.log('Updating symbology data...');
+
+    try {
+      await this.db.transaction({ transaction }, async (tx) => {
+        this.logger.log('Downloading symbology data from scryfall...');
+        let symbologyJSONData = (
+          await firstValueFrom(this.http.get('https://api.scryfall.com/symbology ', {}))
+        ).data.data;
+        this.logger.log('Done downloading symbology data...');
+
+        let scryfallData = plainToInstance(
+          ScryfallDataDTO,
+          {
+            symbology: symbologyJSONData,
+          },
+          {
+            excludeExtraneousValues: true,
+            exposeUnsetFields: true,
+            exposeDefaultValues: true,
+          },
+        );
+        let errors = await validate(scryfallData, {
+          skipMissingProperties: false,
+          whitelist: true,
+        });
+
+        if (errors.length > 0) {
+          throw errors;
+        }
+
+        this.logger.log('Inserting symbology data into database...');
+        await this.symbologyModel.truncate({ logging: false, transaction: tx });
+        await this.symbologyModel.bulkCreate(scryfallData.symbology, {
+          logging: false,
+          transaction: tx,
+        });
+        this.logger.log('Done inserting symbology data...');
+      });
+    } catch (error) {
+      log(error);
+      this.logger.error('Update Failed. Rolling back update...');
+      this.logger.error(error);
+      throw error;
     }
   }
 }

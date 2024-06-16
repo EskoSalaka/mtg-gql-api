@@ -649,6 +649,25 @@ type CardList {
   total_rows: Int!
 }
 
+type Symbology {
+  id: UUID!
+  object: String!
+  symbol: String!
+  svg_uri: String!
+  loose_variant: String
+  english: String!
+  transposable: Boolean!
+  represents_mana: Boolean!
+  appears_in_mana_costs: Boolean!
+  mana_value: Int
+  hybrid: Boolean!
+  phyrexian: Boolean!
+  cmc: Int
+  funny: Boolean!
+  colors: [Color!]!
+  gatherer_alternates: [String!]
+}
+
 type PageInfo {
   limit: Float!
   page: Float!
@@ -680,6 +699,11 @@ type RulingHeaderPage {
   page_info: PageInfo!
 }
 
+type SymbologyList {
+  rows: [Symbology!]!
+  total_rows: Int!
+}
+
 type Query {
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
@@ -695,6 +719,7 @@ type Query {
   sets(where: JSONObject): SetHeaderList!
   ruling(id: String!): Ruling!
   rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingHeaderPage!
+  symbology(where: JSONObject): SymbologyList!
 }
 
 """

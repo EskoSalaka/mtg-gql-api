@@ -1,10 +1,9 @@
 import { Global, Logger, Module, ValidationPipe } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import * as path from 'path';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { SetModule } from './modules/set/set.module';
-import { HttpModule } from '@nestjs/axios';
 import { ServerUtilsModule } from './modules/server-utils/server-utils.module';
 import { CardFace } from './modules/card/models/card-face.model';
 import { Card } from './modules/card/models/card.model';
@@ -18,6 +17,8 @@ import { Ruling } from './modules/ruling/models/ruling.model';
 import { CardModule } from './modules/card/card.module';
 import { LatestPrice, Price } from './modules/card/models/price.model';
 import { RulingModule } from './modules/ruling/ruling.module';
+import { SymbologyModule } from './modules/symbology/symbology.module';
+import { Symbology } from './modules/symbology/models/symbology.model';
 
 @Global()
 @Module({
@@ -102,7 +103,7 @@ import { RulingModule } from './modules/ruling/ruling.module';
             logger.verbose('Benchmark: ' + timimgs + 'ms');
           },
           autoLoadModels: true,
-          models: [Card, CardFace, Set, Ruling, Price, LatestPrice],
+          models: [Card, CardFace, Set, Ruling, Price, LatestPrice, Symbology],
           repositoryMode: false,
           ssl: true,
         };
@@ -135,6 +136,7 @@ import { RulingModule } from './modules/ruling/ruling.module';
     CardModule,
     SetModule,
     RulingModule,
+    SymbologyModule,
     ServerUtilsModule,
   ],
   controllers: [],

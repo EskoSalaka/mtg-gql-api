@@ -10,9 +10,10 @@ import { GlobalExceptionFilter } from './filters/global-exception-filter';
 import { GQLReqLoggingPlugin } from './plugings/gqlLogger';
 import { CardModule } from '../card/card.module';
 import { RulingModule } from '../ruling/ruling.module';
+import { SymbologyModule } from '../symbology/symbology.module';
 
 @Module({
-  imports: [SetModule, CardModule, RulingModule, TerminusModule, HttpModule],
+  imports: [SetModule, CardModule, RulingModule, SymbologyModule, TerminusModule, HttpModule],
   providers: [
     DBUpdateService,
     GQLReqLoggingPlugin,
