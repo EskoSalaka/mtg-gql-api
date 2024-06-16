@@ -20,6 +20,7 @@ import { RulingModule } from './modules/ruling/ruling.module';
 import { SymbologyModule } from './modules/symbology/symbology.module';
 import { Symbology } from './modules/symbology/models/symbology.model';
 import { DataLoaderInterceptor } from './common/interceptors/dataloader.interceptor';
+import depthLimit from 'graphql-depth-limit';
 
 @Global()
 @Module({
@@ -117,6 +118,7 @@ import { DataLoaderInterceptor } from './common/interceptors/dataloader.intercep
       useFactory: async (config: ConfigService<EnvironmentVariables>) => ({
         autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
         playground: config.get('APOLLO_PLAYGROUND'),
+        validationRules: [depthLimit(config.get('APOLLO_DEPTH_LIMIT'))],
         formatError: (error) => {
           const originalError = error.extensions?.originalError as Error;
 

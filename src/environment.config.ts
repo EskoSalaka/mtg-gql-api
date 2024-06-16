@@ -56,6 +56,13 @@ export class EnvironmentVariables {
   APOLLO_PLAYGROUND: boolean = true;
 
   @Expose()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Transform(({ value }) => parseInt(value))
+  APOLLO_DEPTH_LIMIT: number = 5;
+
+  @Expose()
   @IsNumber()
   @Min(0)
   @Max(65535)

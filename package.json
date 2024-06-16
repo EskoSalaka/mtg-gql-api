@@ -37,6 +37,7 @@
     "dataloader": "^2.2.2",
     "dotenv": "^16.4.5",
     "graphql": "^16.8.2",
+    "graphql-depth-limit": "^1.1.0",
     "graphql-fields-list": "^2.2.4",
     "graphql-scalars": "^1.23.0",
     "graphql-sequelize": "^9.5.1",
