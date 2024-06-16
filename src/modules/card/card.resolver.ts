@@ -1,4 +1,4 @@
-import { Args, Info, Query, Resolver } from '@nestjs/graphql';
+import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { Card } from './models/card.model';
 const { fieldsList } = require('graphql-fields-list');
@@ -7,8 +7,12 @@ import { Inject, Logger } from '@nestjs/common';
 import { DefaultQueryArgs, WhereQueryArgs } from 'src/common/types/default-query-args.type';
 import { CardPage } from './types/card-page.type';
 import { CardService } from './card.service';
+import { Set } from '../set/models/set.model';
+import type DataLoader from 'dataloader';
+import { SetLoader } from '../set/dataloaders/set.loader';
+import { Loader } from 'src/common/interceptors/dataloader.interceptor';
 
-@Resolver()
+@Resolver(() => Card)
 export class CardResolver {
   private readonly logger = new Logger(CardResolver.name);
 
@@ -17,7 +21,7 @@ export class CardResolver {
   @Query(() => Card)
   async card(@Args('id') id: string, @Info() context: ExecutionContextHost) {
     let cardAttributes = fieldsList(context, {
-      skip: ['card_faces', 'rulings', 'prices'],
+      skip: ['card_faces', 'rulings', 'prices', 'set'],
     });
     let cardFaceAttributes = fieldsList(context, { path: 'card_faces' });
     let rulingAttributes = fieldsList(context, { path: 'rulings' });
@@ -35,7 +39,7 @@ export class CardResolver {
   async cards(@Args() query: DefaultQueryArgs, @Info() context: ExecutionContextHost) {
     let cardAttributes = fieldsList(context, {
       path: 'rows',
-      skip: ['rows.card_faces', 'rows.rulings', 'rows.prices'],
+      skip: ['rows.card_faces', 'rows.rulings', 'rows.prices', 'rows.set'],
     });
     let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
     let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
@@ -52,7 +56,7 @@ export class CardResolver {
   @Query(() => Card)
   async random_card(@Args() query: WhereQueryArgs, @Info() context: ExecutionContextHost) {
     let cardAttributes = fieldsList(context, {
-      skip: ['card_faces', 'rulings', 'prices'],
+      skip: ['card_faces', 'rulings', 'prices', 'set'],
     });
     let cardFaceAttributes = fieldsList(context, { path: 'card_faces' });
     let rulingAttributes = fieldsList(context, { path: 'rulings' });
@@ -64,5 +68,14 @@ export class CardResolver {
       rulingAttributes,
       priceAttributes,
     });
+  }
+
+  @ResolveField(() => Set)
+  async set(
+    @Parent() parent: Card,
+    @Info() context: ExecutionContextHost,
+    @Loader(SetLoader) setLoader: DataLoader<Set['id'], Set>,
+  ) {
+    return setLoader.load(parent.set_id);
   }
 }

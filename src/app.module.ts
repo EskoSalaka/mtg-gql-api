@@ -10,7 +10,7 @@ import { Card } from './modules/card/models/card.model';
 import { Set } from './modules/set/models/set.model';
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EnvironmentVariables, logLevels, validateEnvironment } from './environment.config';
 import { Ruling } from './modules/ruling/models/ruling.model';
@@ -19,6 +19,7 @@ import { LatestPrice, Price } from './modules/card/models/price.model';
 import { RulingModule } from './modules/ruling/ruling.module';
 import { SymbologyModule } from './modules/symbology/symbology.module';
 import { Symbology } from './modules/symbology/models/symbology.model';
+import { DataLoaderInterceptor } from './common/interceptors/dataloader.interceptor';
 
 @Global()
 @Module({
@@ -149,6 +150,10 @@ import { Symbology } from './modules/symbology/models/symbology.model';
         whitelist: true,
         forbidUnknownValues: true,
       }),
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DataLoaderInterceptor,
     },
   ],
   exports: [SequelizeModule],

@@ -138,7 +138,7 @@ export const cardUpdateFields: Array<keyof CardCreationAttributes> = [
   'set_search_uri',
 ];
 @DefaultScope(() => ({
-  attributes: ['id'],
+  attributes: ['id', 'set_id', 'oracle_id'],
 }))
 @Table({ tableName: 'Cards', timestamps: true })
 @ObjectType()
@@ -514,4 +514,7 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   @HasOne(() => LatestPrice)
   @Field(() => LatestPrice)
   prices: LatestPrice | null;
+
+  @Field(() => Set, { name: 'set' })
+  Set: Set;
 }
