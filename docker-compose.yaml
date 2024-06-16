@@ -18,7 +18,6 @@ services:
       - LOG_PATH=/var/log/mtg-gql-api
       - LOG_MAX_SIZE=50000000
       - LOG_MAX_FILES=10
-      - DB_DIALECT=sqlite
       - DB_URI=sqlite:///var/lib/mtg-gql-api/database.sqlite
       - DB_SYNCHRONIZE=true
       

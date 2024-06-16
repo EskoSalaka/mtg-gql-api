@@ -9,7 +9,7 @@ get started and build the database with barely any setup at all
 
 ### Status of the project
 
-The project is now pretty much usable for the current features. There are still a few more things to iron out.
+The project is now pretty much usable for the current features. There are still a few more things to iron out. Some things are still likely to change and there are most likely some minor bugs.
 
 ### List of features
 
@@ -58,10 +58,9 @@ The server uses 'dotenv' under the hood. To get started quickly, create a '.env'
 
 #### Using sqlite
 
-Set the environment variables
+Set the environment variable
 
 ```
-DB_DIALECT="sqlite"
 DB_URI="sqlite://db-data/database.sqlite" # Or wherever your database is
 ```
 
@@ -80,7 +79,6 @@ For postgres, you first need to install a postgres server or use an existing one
 Set the environment variables
 
 ```
-DB_DIALECT="postgres"
 DB_URI="postgresql://myUser:myPassword@localhost:5432/myDatabaseName"
 ```
 
@@ -128,6 +126,10 @@ Apollo Playground is currently enabled by default and you can access it at whate
 ## Queries and Pagination
 
 The Queries that can contain a large amount of results support pagination by using the arguments 'limit' and 'page'. The page_info object in the response can be used by the client to paginate.
+
+Some Queries return a possibly large list of related objects such as Set-->Cards. In these cases the the resulting list is returned in a simple non-paginated list of 'rows' and includes the field 'total_rows' which indicates the total count of these related objects.
+
+In the case where the set of related objects is small, only the objects are returned.
 
 The Queries that support filtering contain a 'where' argument, which is a JSON object that is turned into a query for Sequelize. It behaves in a very similar manner than the normal Sequelize 'where' and supports complex queries combining OR and AND clauses on the columns of the tables.
 

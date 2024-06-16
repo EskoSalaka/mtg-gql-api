@@ -98,12 +98,6 @@ export class EnvironmentVariables {
   // Database configuration
   @Expose()
   @IsOptional()
-  @IsString()
-  @IsEnum(SupportedDialects, { message: 'DB_DIALECT must be one of: postgres, sqlite' })
-  DB_DIALECT: Dialect = 'sqlite';
-
-  @Expose()
-  @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value === 'true' || value === '1')
   DB_SYNCHRONIZE: boolean = false;

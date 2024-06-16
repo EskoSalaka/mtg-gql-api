@@ -80,10 +80,20 @@ import { RulingModule } from './modules/ruling/ruling.module';
       imports: [],
       useFactory: (config: ConfigService<EnvironmentVariables>) => {
         let logger = new Logger('Sequelize');
+        let dialect;
+        let dialectModule;
+
+        if (config.get('DB_URI').includes('sqlite')) {
+          dialect = 'sqlite';
+          dialectModule = require('sqlite3');
+        } else {
+          dialect = 'postgres';
+          dialectModule = require('pg');
+        }
 
         return {
-          dialect: config.get('DB_DIALECT'),
-          dialectModule: config.get('DB_DIALECT') === 'sqlite' ? require('sqlite3') : require('pg'),
+          dialect,
+          dialectModule,
           uri: config.get('DB_URI'),
           synchronize: config.get('DB_SYNCHRONIZE'),
           benchmark: true,
