@@ -8,13 +8,14 @@ import { Card } from './models/card.model';
 import { CardResolver } from './card.resolver';
 import { LatestPrice, Price } from './models/price.model';
 import { CardCatalogResolver } from './card-catalogs.resolver';
+import { CardService } from './card.service';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Card, CardFace, Set, Ruling, Price, LatestPrice], {}),
+    SequelizeModule.forFeature([Card, CardFace, Set, Ruling, Price, LatestPrice]),
     HttpModule,
   ],
-  providers: [CardResolver, Logger, CardCatalogResolver],
+  providers: [CardResolver, Logger, CardCatalogResolver, CardService],
   exports: [SequelizeModule],
 })
 export class CardModule {}

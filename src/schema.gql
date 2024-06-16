@@ -707,6 +707,7 @@ type SymbologyList {
 type Query {
   card(id: String!): Card!
   cards(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): CardPage!
+  random_card(where: JSONObject): Card!
   card_names: CatalogResult!
   card_watermarks: CatalogResult!
   card_artist_names: CatalogResult!
