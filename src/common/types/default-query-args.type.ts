@@ -31,7 +31,7 @@ export class DefaultQueryArgs {
 }
 
 @ArgsType()
-export class WhereQueryArgs extends DefaultQueryArgs {
+export class WhereQueryArgs {
   @Field(() => JSONObjectResolver, { nullable: true })
   @Allow()
   @Transform((tsParams) => argsToFindOptions.default({ where: tsParams.value }).where)

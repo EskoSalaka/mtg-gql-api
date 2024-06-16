@@ -1,6 +1,4 @@
-import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
-import { PageInfo } from 'src/common/types/page-info.type';
+import { Args, Info, ObjectType, Query, Resolver } from '@nestjs/graphql';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 import { Card } from './models/card.model';
 import { CardFace } from './models/card-face.model';
@@ -10,10 +8,12 @@ import * as _ from 'lodash';
 import { Logger } from '@nestjs/common';
 import { replaceKeysDeep } from './utils';
 import { Ruling } from '../ruling/models/ruling.model';
-import { CardPage } from './types/CardPage.type';
 import { LatestPrice } from './models/price.model';
+import { DefaultQueryArgs } from 'src/common/types/default-query-args.type';
+import { buildPaginatedListResult } from 'src/common/types/paginated-list-result.type';
+import { CardPage } from './types/card-page.type';
 
-@Resolver(() => Card)
+@Resolver()
 export class CardResolver {
   private readonly logger = new Logger(CardResolver.name);
   constructor(
@@ -128,18 +128,6 @@ export class CardResolver {
       ],
     });
 
-    let total_pages = Math.ceil(count / query.limit);
-    let page_info: PageInfo = {
-      limit: query.limit,
-      page: query.page,
-      has_more: query.page < total_pages,
-      total_rows: count,
-      total_pages,
-    };
-
-    return {
-      rows,
-      page_info,
-    };
+    return buildPaginatedListResult(query, rows, count);
   }
 }

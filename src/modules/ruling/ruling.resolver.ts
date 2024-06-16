@@ -1,5 +1,4 @@
 import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { DefaultQueryArgs } from 'src/common/types/defaultQueryArgs.type';
 import { InjectModel } from '@nestjs/sequelize';
 const { fieldsList } = require('graphql-fields-list');
 import { Ruling } from '../ruling/models/ruling.model';
@@ -10,6 +9,7 @@ import { Card } from '../card/models/card.model';
 import { CardFace } from '../card/models/card-face.model';
 import { LatestPrice } from '../card/models/price.model';
 import _ from 'lodash';
+import { DefaultQueryArgs } from 'src/common/types/default-query-args.type';
 
 @Resolver(() => Ruling)
 export class RulingResolver {

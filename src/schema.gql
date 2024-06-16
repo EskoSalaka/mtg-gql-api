@@ -50,7 +50,7 @@ type Set {
   uri: String!
   icon_svg_uri: String!
   search_uri: String!
-  cards: [Card!]!
+  cards: CardList!
 }
 
 """
@@ -639,6 +639,16 @@ type SetHeader {
   search_uri: String!
 }
 
+type SetHeaderList {
+  rows: [SetHeader!]!
+  total_rows: Int!
+}
+
+type CardList {
+  rows: [Card!]!
+  total_rows: Int!
+}
+
 type PageInfo {
   limit: Float!
   page: Float!
@@ -682,7 +692,7 @@ type Query {
   card_toughnesses: CatalogResult!
   card_loyalties: CatalogResult!
   set(id: String!): Set!
-  sets(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): [SetHeader!]!
+  sets(where: JSONObject): SetHeaderList!
   ruling(id: String!): Ruling!
   rulings(limit: Int = 100, order: String, page: Int = 1, where: JSONObject): RulingHeaderPage!
 }

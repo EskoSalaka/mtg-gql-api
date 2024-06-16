@@ -136,6 +136,5 @@ export class Set extends Model<SetAttributes, SetCreationAttributes> {
   search_uri: string;
 
   @HasMany(() => Card)
-  @Field(() => [Card])
   cards: Card[];
 }
