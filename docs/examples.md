@@ -37,6 +37,38 @@ query card {
     }
   }
 }
+
+query random_card_R {
+  random_card(where: { colors: { like: "%R%" } }) {
+    name
+    set_code
+    colors
+    card_faces {
+      id
+      name
+    }
+    rulings {
+      id
+      comment
+    }
+  }
+}
+
+query random_card_from_set {
+  random_card(where: { set_code: "unh" }) {
+    name
+    set_code
+    colors
+    card_faces {
+      id
+      name
+    }
+    rulings {
+      id
+      comment
+    }
+  }
+}
 ```
 
 ## Sets
