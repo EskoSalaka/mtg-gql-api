@@ -155,7 +155,7 @@ export class CardService {
   ) {
     let results;
 
-    if (!allow_duplicates) {
+    if (allow_duplicates) {
       results = await Promise.all(
         Array.from({ length: count }).map(async () => {
           let result = await this.findOneRandom(query, fields);
