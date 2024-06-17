@@ -134,34 +134,43 @@ export class CardService {
       priceAttributes: string[];
     },
   ) {
-    let topLevelWhere = this._toTopLevelAttributes(query.where);
+    let result = await this.findAll(
+      { limit: 1, where: query.where, order: this.sequelize.random(), page: 1 },
+      fields,
+    );
 
-    let result = await this.cardModel.findOne({
-      attributes: fields.cardAttributes,
-      limit: 1,
-      where: topLevelWhere as any,
-      order: this.sequelize.random(),
-      include: [
-        {
-          model: CardFace,
-          attributes: fields.cardFaceAttributes,
-          duplicating: false,
-        },
-        {
-          model: Ruling,
-          attributes: fields.rulingAttributes,
-          duplicating: false,
-        },
-        {
-          model: LatestPrice,
-          as: 'prices',
-          attributes: fields.priceAttributes,
-          duplicating: false,
-        },
-      ],
-    });
+    return result[0];
+  }
 
-    return result;
+  async findManyRandom(
+    count: number,
+    allow_duplicates: boolean,
+    query: WhereQueryArgs,
+    fields: {
+      cardAttributes: string[];
+      cardFaceAttributes: string[];
+      rulingAttributes: string[];
+      priceAttributes: string[];
+    },
+  ) {
+    let results;
+
+    if (allow_duplicates) {
+      results = await Promise.all(
+        Array.from({ length: count }).map(async () => {
+          let result = await this.findOneRandom(query, fields);
+
+          return result;
+        }),
+      );
+    } else {
+      results = await this.findAll(
+        { limit: count, where: query.where, order: this.sequelize.random(), page: 1 },
+        fields,
+      );
+    }
+
+    return results;
   }
 
   _toTopLevelAttributes(where: WhereQueryArgs['where']) {

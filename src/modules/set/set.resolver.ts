@@ -6,7 +6,6 @@ import { WhereQueryArgs } from 'src/common/types/default-query-args.type';
 import { SetHeaderList } from './types/set-header-list.type';
 import { CardList } from './types/card-list.type';
 import { SetService } from './set.service';
-import { Inject } from '@nestjs/common';
 
 @Resolver(() => Set)
 export class SetResolver {

@@ -12,6 +12,8 @@ import type DataLoader from 'dataloader';
 import { SetLoader } from '../set/dataloaders/set.loader';
 import { Loader } from 'src/common/interceptors/dataloader.interceptor';
 import { buildPaginatedListResult } from 'src/common/types/paginated-list-result.type';
+import { CardList } from '../set/types/card-list.type';
+import { RandomCardsOptionsInput } from './types/random-cards-options-input.type';
 
 @Resolver(() => Card)
 export class CardResolver {
@@ -71,6 +73,35 @@ export class CardResolver {
       rulingAttributes,
       priceAttributes,
     });
+  }
+
+  @Query(() => CardList)
+  async random_cards(
+    @Args('options') options: RandomCardsOptionsInput,
+    @Args() query: WhereQueryArgs,
+    @Info() context: ExecutionContextHost,
+  ) {
+    let cardAttributes = fieldsList(context, {
+      path: 'rows',
+      skip: ['rows.card_faces', 'rows.rulings', 'rows.prices', 'rows.set'],
+    });
+    let cardFaceAttributes = fieldsList(context, { path: 'rows.card_faces' });
+    let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
+    let priceAttributes = fieldsList(context, { path: 'rows.prices' });
+
+    let rows = await this.cardService.findManyRandom(
+      options.count,
+      options.allow_dulicates,
+      query,
+      {
+        cardAttributes,
+        cardFaceAttributes,
+        rulingAttributes,
+        priceAttributes,
+      },
+    );
+
+    return { rows, total_rows: options.count };
   }
 
   @ResolveField(() => Set)
