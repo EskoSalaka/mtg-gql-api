@@ -5,7 +5,6 @@ import { CardFace } from './models/card-face.model';
 import { Ruling } from '../ruling/models/ruling.model';
 import { LatestPrice } from './models/price.model';
 import { replaceKeysDeep } from './utils';
-import { buildPaginatedListResult } from 'src/common/types/paginated-list-result.type';
 import { Card } from './models/card.model';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -51,7 +50,7 @@ export class CardService {
     return card;
   }
 
-  async find(
+  async findAll(
     query: DefaultQueryArgs,
     fields: {
       cardAttributes: string[];
@@ -60,50 +59,13 @@ export class CardService {
       priceAttributes: string[];
     },
   ) {
-    let topLevelCardAttrMap = Object.keys(Card.getAttributes()).reduce((acc, key) => {
-      acc[key] = `$Card.${key}$`;
-      return acc;
-    }, {});
-    let topLevelCardFaceAttrMap = Object.keys(CardFace.getAttributes()).reduce((acc, key) => {
-      acc['card_faces_' + key] = `$card_faces.${key}$`;
-      return acc;
-    }, {});
-    let topLevelRulingAttrMap = Object.keys(Ruling.getAttributes()).reduce((acc, key) => {
-      acc['rulings_' + key] = `$rulings.${key}$`;
-      return acc;
-    }, {});
-    let topLevelPriceAttrMap = Object.keys(LatestPrice.getAttributes()).reduce((acc, key) => {
-      acc['prices_' + key] = `$prices.${key}$`;
-      return acc;
-    }, {});
-
-    let mergedAttrmaps = {
-      ...topLevelCardAttrMap,
-      ...topLevelCardFaceAttrMap,
-      ...topLevelRulingAttrMap,
-      ...topLevelPriceAttrMap,
-    };
-    let mappedWhere = replaceKeysDeep(query.where, mergedAttrmaps);
-
-    let count = await this.cardModel.count({
-      distinct: true,
-      where: mappedWhere as any,
-      include: [
-        CardFace,
-        Ruling,
-        {
-          model: LatestPrice,
-          as: 'prices',
-          duplicating: false,
-        },
-      ],
-    });
+    let topLevelWhere = this._toTopLevelAttributes(query.where);
 
     let rows = await this.cardModel.findAll({
       limit: query.limit,
       offset: query.limit * (query.page - 1),
       attributes: fields.cardAttributes,
-      where: mappedWhere as any,
+      where: topLevelWhere as any,
       order: query.order ? query.order : [['name', 'ASC']],
       include: [
         {
@@ -125,7 +87,42 @@ export class CardService {
       ],
     });
 
-    return buildPaginatedListResult(query, rows, count);
+    return rows;
+  }
+
+  async findAndCountAll(
+    query: DefaultQueryArgs,
+    fields: {
+      cardAttributes: string[];
+      cardFaceAttributes: string[];
+      rulingAttributes: string[];
+      priceAttributes: string[];
+    },
+  ) {
+    let count = await this.countAll(query.where);
+    let rows = await this.findAll(query, fields);
+
+    return { count, rows };
+  }
+
+  async countAll(where: DefaultQueryArgs['where']) {
+    let topLevelWhere = this._toTopLevelAttributes(where);
+
+    let count = await this.cardModel.count({
+      distinct: true,
+      where: topLevelWhere as any,
+      include: [
+        CardFace,
+        Ruling,
+        {
+          model: LatestPrice,
+          as: 'prices',
+          duplicating: false,
+        },
+      ],
+    });
+
+    return count;
   }
 
   async findOneRandom(
@@ -137,35 +134,12 @@ export class CardService {
       priceAttributes: string[];
     },
   ) {
-    let topLevelCardAttrMap = Object.keys(Card.getAttributes()).reduce((acc, key) => {
-      acc[key] = `$Card.${key}$`;
-      return acc;
-    }, {});
-    let topLevelCardFaceAttrMap = Object.keys(CardFace.getAttributes()).reduce((acc, key) => {
-      acc['card_faces_' + key] = `$card_faces.${key}$`;
-      return acc;
-    }, {});
-    let topLevelRulingAttrMap = Object.keys(Ruling.getAttributes()).reduce((acc, key) => {
-      acc['rulings_' + key] = `$rulings.${key}$`;
-      return acc;
-    }, {});
-    let topLevelPriceAttrMap = Object.keys(LatestPrice.getAttributes()).reduce((acc, key) => {
-      acc['prices_' + key] = `$prices.${key}$`;
-      return acc;
-    }, {});
-
-    let mergedAttrmaps = {
-      ...topLevelCardAttrMap,
-      ...topLevelCardFaceAttrMap,
-      ...topLevelRulingAttrMap,
-      ...topLevelPriceAttrMap,
-    };
-    let mappedWhere = replaceKeysDeep(query.where, mergedAttrmaps);
+    let topLevelWhere = this._toTopLevelAttributes(query.where);
 
     let result = await this.cardModel.findOne({
       attributes: fields.cardAttributes,
       limit: 1,
-      where: mappedWhere as any,
+      where: topLevelWhere as any,
       order: this.sequelize.random(),
       include: [
         {
@@ -188,5 +162,35 @@ export class CardService {
     });
 
     return result;
+  }
+
+  _toTopLevelAttributes(where: WhereQueryArgs['where']) {
+    let topLevelCardAttrMap = Object.keys(Card.getAttributes()).reduce((acc, key) => {
+      acc[key] = `$Card.${key}$`;
+      return acc;
+    }, {});
+    let topLevelCardFaceAttrMap = Object.keys(CardFace.getAttributes()).reduce((acc, key) => {
+      acc['card_faces_' + key] = `$card_faces.${key}$`;
+      return acc;
+    }, {});
+    let topLevelRulingAttrMap = Object.keys(Ruling.getAttributes()).reduce((acc, key) => {
+      acc['rulings_' + key] = `$rulings.${key}$`;
+      return acc;
+    }, {});
+    let topLevelPriceAttrMap = Object.keys(LatestPrice.getAttributes()).reduce((acc, key) => {
+      acc['prices_' + key] = `$prices.${key}$`;
+      return acc;
+    }, {});
+
+    let mergedAttrmaps = {
+      ...topLevelCardAttrMap,
+      ...topLevelCardFaceAttrMap,
+      ...topLevelRulingAttrMap,
+      ...topLevelPriceAttrMap,
+    };
+
+    let mappedWhere = replaceKeysDeep(where, mergedAttrmaps);
+
+    return mappedWhere;
   }
 }

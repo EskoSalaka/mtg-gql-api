@@ -1,40 +1,29 @@
 import { Args, Info, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { InjectModel } from '@nestjs/sequelize';
-import { CardFace } from 'src/modules/card/models/card-face.model';
-import { Card } from 'src/modules/card/models/card.model';
 import { Set } from './models/set.model';
 const { fieldsList } = require('graphql-fields-list');
 import type { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
-import { Ruling } from '../ruling/models/ruling.model';
-import { LatestPrice } from '../card/models/price.model';
 import { WhereQueryArgs } from 'src/common/types/default-query-args.type';
 import { SetHeaderList } from './types/set-header-list.type';
 import { CardList } from './types/card-list.type';
+import { SetService } from './set.service';
+import { Inject } from '@nestjs/common';
 
 @Resolver(() => Set)
 export class SetResolver {
-  constructor(
-    @InjectModel(Set)
-    private setModel: typeof Set,
-  ) {}
+  constructor(private setService: SetService) {}
 
   @Query(() => Set)
   async set(@Args('id') id: string, @Info() context: ExecutionContextHost) {
     let selectedFields = fieldsList(context, { skip: ['cards'] });
 
-    return this.setModel.findByPk(id, {
-      attributes: selectedFields,
-    });
+    return this.setService.findOne(id, { setAttributes: selectedFields });
   }
 
   @Query(() => SetHeaderList)
   async sets(@Args() query: WhereQueryArgs, @Info() context: ExecutionContextHost) {
     let selectedFields = fieldsList(context, { path: 'rows', skip: ['rows.cards', 'total_rows'] });
 
-    let rows = await this.setModel.findAll({
-      where: query.where,
-      attributes: selectedFields,
-    });
+    let rows = await this.setService.findAll(query);
 
     return { rows, total_rows: rows.length };
   }
@@ -49,33 +38,13 @@ export class SetResolver {
     let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
     let priceAttributes = fieldsList(context, { path: 'rows.prices' });
 
-    let set = await this.setModel.findByPk(parent.id, {
-      include: [
-        {
-          model: Card,
-          attributes: cardAttributes,
-          include: [
-            {
-              model: CardFace,
-              attributes: cardFaceAttributes,
-              duplicating: false,
-            },
-            {
-              model: Ruling,
-              attributes: rulingAttributes,
-              duplicating: false,
-            },
-            {
-              model: LatestPrice,
-              as: 'prices',
-              attributes: priceAttributes,
-              duplicating: false,
-            },
-          ],
-        },
-      ],
+    let cards = await this.setService.cards(parent.id, {
+      cardAttributes,
+      cardFaceAttributes,
+      rulingAttributes,
+      priceAttributes,
     });
 
-    return { rows: set.cards, total_rows: set.cards.length };
+    return { rows: cards, total_rows: cards.length };
   }
 }

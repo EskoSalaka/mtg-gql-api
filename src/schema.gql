@@ -28,29 +28,32 @@ type CardImagery {
   small: String
 }
 
-type Set {
-  id: UUID!
-  object: String!
-  code: String!
-  mtgo_code: String
-  arena_code: String
-  tcgplayer_id: Int
+type CardFace {
+  id: String!
+  card_id: UUID!
+  artist: String
+  artist_id: UUID
+  cmc: Int
+  color_indicator: [Color!]
+  colors: [Color!]
+  defense: String
+  flavor_text: String
+  illustration_id: String
+  image_uris: CardImagery
+  layout: Layout
+  loyalty: String
+  mana_cost: String!
   name: String!
-  set_type: SetType!
-  released_at: DateTime!
-  block_code: String
-  block: String
-  parent_set_code: String
-  card_count: Float!
-  printed_size: Int
-  digital: Boolean!
-  foil_only: Boolean!
-  nonfoil_only: Boolean!
-  scryfall_uri: String!
-  uri: String!
-  icon_svg_uri: String!
-  search_uri: String!
-  cards: CardList!
+  object: String!
+  oracle_id: String
+  oracle_text: String
+  power: String
+  printed_name: String
+  printed_text: String
+  printed_type_line: String
+  toughness: String
+  type_line: String
+  watermark: String
 }
 
 """
@@ -58,84 +61,98 @@ A field whose value is a generic Universally Unique Identifier: https://en.wikip
 """
 scalar UUID
 
-"\n  Scryfall provides an overall categorization for each Set in the set_type property.\n  "
-enum SetType {
-  """A yearly Magic core set (Tenth Edition, etc)"""
-  core
+"\nColor Arrays\n\nWhenever the API presents set of Magic colors, the field will be an array that uses the uppercase, single-character abbreviations for those colors. For example, [\"W\",\"U\"] represents something that is both white and blue. Colorless sources are denoted with an empty array []\n\nCommon places were you might see this kind of array are a Card object’s colors and color_identity. When a color field is null or missing, it implies that that information is not pertinent for the current object. It does not imply that the object is colorless.\n\nColor arrays are not guaranteed to be in a particular order.\n  "
+enum Color {
+  """White"""
+  W
 
-  """A rotational expansion set in a block"""
-  expansion
+  """Blue"""
+  U
 
-  """A reprint set that contains no new cards"""
-  masters
+  """Black"""
+  B
 
-  """An Arena-only digital set"""
-  alchemy
+  """Red"""
+  R
 
-  """Masterpiece Series premium foil cards"""
-  masterpiece
-
-  """A set that contains a marketing card"""
-  arsenal
-
-  """From the Vault gift sets"""
-  from_the_vault
-
-  """Spellbook series gift sets"""
-  spellbook
-
-  """Premium Deck Series decks"""
-  premium_deck
-
-  """Duel Decks"""
-  duel_deck
-
-  """Draft Innovation product sets"""
-  draft_innovation
-
-  """Magic Online treasure chest prize sets"""
-  treasure_chest
-
-  """Commander preconstructed decks"""
-  commander
-
-  """Planechase sets"""
-  planechase
-
-  """Archenemy sets"""
-  archenemy
-
-  """Vanguard card sets"""
-  vanguard
-
-  """A funny un-set or set with funny promos"""
-  funny
-
-  """A starter/introductory set"""
-  starter
-
-  """A gift box set"""
-  box
-
-  """A set with non-redeemable promotional cards"""
-  promo
-
-  """A set made up of tokens and emblems"""
-  token
-
-  """
-  A set made up of gold-bordered, oversize, or trophy cards that are not legal
-  """
-  memorabilia
-
-  """A set made up of minigames"""
-  minigame
+  """Green"""
+  G
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
+"\n  The layout property categorizes the arrangement of card parts, faces, and other bounded regions on cards. The layout can be used to programmatically determine which other properties on a card you can expect.\n\n  Specifically:\n  \n      Cards with the layouts split, flip, transform, and double_faced_token will always have a card_faces property describing the distinct faces.\n      Cards with the layout meld will always have an all_parts property pointing to the other meld parts.\n  "
+enum Layout {
+  """A standard Magic card with one face"""
+  normal
+
+  """A split-faced card"""
+  split
+
+  """Cards that invert vertically with the flip keyword"""
+  flip
+
+  """Double-sided cards that transform"""
+  transform
+
+  """Double-sided cards that can be played either-side"""
+  modal_dfc
+
+  """Cards with meld parts printed on the back"""
+  meld
+
+  """Cards with Level Up"""
+  leveler
+
+  """Class-type enchantment cards"""
+  class
+
+  """Case-type enchantment cards"""
+  case
+
+  """Saga-type cards"""
+  saga
+
+  """Cards with an Adventure spell part"""
+  adventure
+
+  """Cards with Mutate"""
+  mutate
+
+  """Cards with Prototype"""
+  prototype
+
+  """Battle-type cards"""
+  battle
+
+  """Plane and Phenomenon-type cards"""
+  planar
+
+  """Scheme-type cards"""
+  scheme
+
+  """Vanguard-type cards"""
+  vanguard
+
+  """Token cards"""
+  token
+
+  """Tokens with another token printed on the back"""
+  double_faced_token
+
+  """Emblem cards"""
+  emblem
+
+  """Cards with Augment"""
+  augment
+
+  """Host-type cards"""
+  host
+
+  """Art Series collectable double-faced cards"""
+  art_series
+
+  """A Magic card with two sides that are unrelated"""
+  reversible_card
+}
 
 """An object describing the legality of a card across play formats."""
 type Legalities {
@@ -216,6 +233,11 @@ type Ruling {
   comment: String!
   cards: [Card!]
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Price {
   id: String!
@@ -318,6 +340,7 @@ type Card {
   set_name: String!
   set_search_uri: URL!
   set_type: String!
+  set_uri: String!
   set_code: String!
   set_id: UUID!
   story_spotlight: Boolean!
@@ -387,103 +410,10 @@ enum Language {
   ph
 }
 
-"\n  The layout property categorizes the arrangement of card parts, faces, and other bounded regions on cards. The layout can be used to programmatically determine which other properties on a card you can expect.\n\n  Specifically:\n  \n      Cards with the layouts split, flip, transform, and double_faced_token will always have a card_faces property describing the distinct faces.\n      Cards with the layout meld will always have an all_parts property pointing to the other meld parts.\n  "
-enum Layout {
-  """A standard Magic card with one face"""
-  normal
-
-  """A split-faced card"""
-  split
-
-  """Cards that invert vertically with the flip keyword"""
-  flip
-
-  """Double-sided cards that transform"""
-  transform
-
-  """Double-sided cards that can be played either-side"""
-  modal_dfc
-
-  """Cards with meld parts printed on the back"""
-  meld
-
-  """Cards with Level Up"""
-  leveler
-
-  """Class-type enchantment cards"""
-  class
-
-  """Case-type enchantment cards"""
-  case
-
-  """Saga-type cards"""
-  saga
-
-  """Cards with an Adventure spell part"""
-  adventure
-
-  """Cards with Mutate"""
-  mutate
-
-  """Cards with Prototype"""
-  prototype
-
-  """Battle-type cards"""
-  battle
-
-  """Plane and Phenomenon-type cards"""
-  planar
-
-  """Scheme-type cards"""
-  scheme
-
-  """Vanguard-type cards"""
-  vanguard
-
-  """Token cards"""
-  token
-
-  """Tokens with another token printed on the back"""
-  double_faced_token
-
-  """Emblem cards"""
-  emblem
-
-  """Cards with Augment"""
-  augment
-
-  """Host-type cards"""
-  host
-
-  """Art Series collectable double-faced cards"""
-  art_series
-
-  """A Magic card with two sides that are unrelated"""
-  reversible_card
-}
-
 """
 A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
 """
 scalar URL
-
-"\nColor Arrays\n\nWhenever the API presents set of Magic colors, the field will be an array that uses the uppercase, single-character abbreviations for those colors. For example, [\"W\",\"U\"] represents something that is both white and blue. Colorless sources are denoted with an empty array []\n\nCommon places were you might see this kind of array are a Card object’s colors and color_identity. When a color field is null or missing, it implies that that information is not pertinent for the current object. It does not imply that the object is colorless.\n\nColor arrays are not guaranteed to be in a particular order.\n  "
-enum Color {
-  """White"""
-  W
-
-  """Blue"""
-  U
-
-  """Black"""
-  B
-
-  """Red"""
-  R
-
-  """Green"""
-  G
-}
 
 "\n  The frame_effects field tracks additional frame artwork applied over a particular frame. \n  For example, there are both 2003 and 2015-frame cards with the Nyx-touched effect.\n  "
 enum FrameEffect {
@@ -588,32 +518,103 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
-type CardFace {
-  id: String!
-  card_id: UUID!
-  artist: String
-  artist_id: UUID
-  cmc: Int
-  color_indicator: [Color!]
-  colors: [Color!]
-  defense: String
-  flavor_text: String
-  illustration_id: String
-  image_uris: CardImagery
-  layout: Layout
-  loyalty: String
-  mana_cost: String!
-  name: String!
+type Set {
+  id: UUID!
   object: String!
-  oracle_id: String
-  oracle_text: String
-  power: String
-  printed_name: String
-  printed_text: String
-  printed_type_line: String
-  toughness: String
-  type_line: String
-  watermark: String
+  code: String!
+  mtgo_code: String
+  arena_code: String
+  tcgplayer_id: Int
+  name: String!
+  set_type: SetType!
+  released_at: DateTime!
+  block_code: String
+  block: String
+  parent_set_code: String
+  card_count: Float!
+  printed_size: Int
+  digital: Boolean!
+  foil_only: Boolean!
+  nonfoil_only: Boolean!
+  scryfall_uri: String!
+  uri: String!
+  icon_svg_uri: String!
+  search_uri: String!
+  cards: CardList!
+}
+
+"\n  Scryfall provides an overall categorization for each Set in the set_type property.\n  "
+enum SetType {
+  """A yearly Magic core set (Tenth Edition, etc)"""
+  core
+
+  """A rotational expansion set in a block"""
+  expansion
+
+  """A reprint set that contains no new cards"""
+  masters
+
+  """An Arena-only digital set"""
+  alchemy
+
+  """Masterpiece Series premium foil cards"""
+  masterpiece
+
+  """A set that contains a marketing card"""
+  arsenal
+
+  """From the Vault gift sets"""
+  from_the_vault
+
+  """Spellbook series gift sets"""
+  spellbook
+
+  """Premium Deck Series decks"""
+  premium_deck
+
+  """Duel Decks"""
+  duel_deck
+
+  """Draft Innovation product sets"""
+  draft_innovation
+
+  """Magic Online treasure chest prize sets"""
+  treasure_chest
+
+  """Commander preconstructed decks"""
+  commander
+
+  """Planechase sets"""
+  planechase
+
+  """Archenemy sets"""
+  archenemy
+
+  """Vanguard card sets"""
+  vanguard
+
+  """A funny un-set or set with funny promos"""
+  funny
+
+  """A starter/introductory set"""
+  starter
+
+  """A gift box set"""
+  box
+
+  """A set with non-redeemable promotional cards"""
+  promo
+
+  """A set made up of tokens and emblems"""
+  token
+
+  """
+  A set made up of gold-bordered, oversize, or trophy cards that are not legal
+  """
+  memorabilia
+
+  """A set made up of minigames"""
+  minigame
 }
 
 type SetHeader {

@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   DefaultScope,
@@ -442,11 +443,10 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   set_type: string;
 
   @Column(DataType.STRING)
+  @Field()
   set_uri: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
+  @Column(DataType.STRING)
   @Field()
   set_code: string;
 
@@ -516,5 +516,6 @@ export class Card extends Model<CardAttributes, CardCreationAttributes> {
   prices: LatestPrice | null;
 
   @Field(() => Set, { name: 'set' })
-  Set: Set;
+  @BelongsTo(() => Set)
+  Set: typeof Set;
 }

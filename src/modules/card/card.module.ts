@@ -10,13 +10,15 @@ import { LatestPrice, Price } from './models/price.model';
 import { CardCatalogResolver } from './card-catalogs.resolver';
 import { CardService } from './card.service';
 import { SetLoader } from '../set/dataloaders/set.loader';
+import { SetModule } from '../set/set.module';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Card, CardFace, Set, Ruling, Price, LatestPrice]),
+    SequelizeModule.forFeature([Card, CardFace, Ruling, Price, LatestPrice]),
     HttpModule,
+    SetModule,
   ],
   providers: [CardResolver, Logger, CardCatalogResolver, CardService, SetLoader],
-  exports: [SequelizeModule],
+  exports: [SequelizeModule, CardService],
 })
 export class CardModule {}

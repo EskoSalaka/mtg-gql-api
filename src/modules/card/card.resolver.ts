@@ -11,6 +11,7 @@ import { Set } from '../set/models/set.model';
 import type DataLoader from 'dataloader';
 import { SetLoader } from '../set/dataloaders/set.loader';
 import { Loader } from 'src/common/interceptors/dataloader.interceptor';
+import { buildPaginatedListResult } from 'src/common/types/paginated-list-result.type';
 
 @Resolver(() => Card)
 export class CardResolver {
@@ -45,12 +46,14 @@ export class CardResolver {
     let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
     let priceAttributes = fieldsList(context, { path: 'rows.prices' });
 
-    return this.cardService.find(query, {
+    let { count, rows } = await this.cardService.findAndCountAll(query, {
       cardAttributes,
       cardFaceAttributes,
       rulingAttributes,
       priceAttributes,
     });
+
+    return buildPaginatedListResult(query, rows, count);
   }
 
   @Query(() => Card)
@@ -71,11 +74,7 @@ export class CardResolver {
   }
 
   @ResolveField(() => Set)
-  async set(
-    @Parent() parent: Card,
-    @Info() context: ExecutionContextHost,
-    @Loader(SetLoader) setLoader: DataLoader<Set['id'], Set>,
-  ) {
+  async set(@Parent() parent: Card, @Loader(SetLoader) setLoader: DataLoader<Set['id'], Set>) {
     return setLoader.load(parent.set_id);
   }
 }

@@ -20,7 +20,7 @@ import { RulingModule } from './modules/ruling/ruling.module';
 import { SymbologyModule } from './modules/symbology/symbology.module';
 import { Symbology } from './modules/symbology/models/symbology.model';
 import { DataLoaderInterceptor } from './common/interceptors/dataloader.interceptor';
-import depthLimit from 'graphql-depth-limit';
+const depthLimit = require('graphql-depth-limit');
 
 @Global()
 @Module({
