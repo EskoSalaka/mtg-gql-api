@@ -15,6 +15,10 @@ export class SetService {
       attributes: fields.setAttributes,
     });
 
+    if (!result) {
+      throw new Error(`Set with id ${id} not found.`);
+    }
+
     return result;
   }
 

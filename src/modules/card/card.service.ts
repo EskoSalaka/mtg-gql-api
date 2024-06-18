@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { DefaultQueryArgs, type WhereQueryArgs } from 'src/common/types/default-query-args.type';
 import { CardFace } from './models/card-face.model';
@@ -7,9 +7,13 @@ import { LatestPrice } from './models/price.model';
 import { replaceKeysDeep } from './utils';
 import { Card } from './models/card.model';
 import { Sequelize } from 'sequelize-typescript';
+import { EntityNotFoundException } from 'src/common/exceptions/entity-not-found.exception';
+import { RandomCardGenerationException } from './exceptions/random-card-generation.exception';
 
 @Injectable()
 export class CardService {
+  private readonly logger = new Logger(CardService.name);
+
   constructor(
     @InjectModel(Card)
     private readonly cardModel: typeof Card,
@@ -46,6 +50,10 @@ export class CardService {
         },
       ],
     });
+
+    if (!card) {
+      throw new EntityNotFoundException('Card', id);
+    }
 
     return card;
   }
@@ -139,6 +147,11 @@ export class CardService {
       fields,
     );
 
+    if (result.length === 0) {
+      this.logger.error('Failed to generate random card');
+      throw new RandomCardGenerationException();
+    }
+
     return result[0];
   }
 
@@ -168,6 +181,11 @@ export class CardService {
         { limit: count, where: query.where, order: this.sequelize.random(), page: 1 },
         fields,
       );
+    }
+
+    if (results.length < count) {
+      this.logger.error('Failed to generate random cards');
+      throw new RandomCardGenerationException();
     }
 
     return results;

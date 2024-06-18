@@ -10,6 +10,7 @@ import { CardFace } from '../card/models/card-face.model';
 import { LatestPrice } from '../card/models/price.model';
 import _ from 'lodash';
 import { DefaultQueryArgs } from 'src/common/types/default-query-args.type';
+import { EntityNotFoundException } from 'src/common/exceptions/entity-not-found.exception';
 
 @Resolver(() => Ruling)
 export class RulingResolver {
@@ -24,9 +25,15 @@ export class RulingResolver {
       skip: ['cards'],
     });
 
-    return this.rulingModel.findByPk(id, {
+    let ruling = await this.rulingModel.findByPk(id, {
       attributes: rulingAttributes,
     });
+
+    if (!ruling) {
+      throw new EntityNotFoundException('Ruling', id);
+    }
+
+    return ruling;
   }
 
   @Query(() => RulingHeaderPage)
