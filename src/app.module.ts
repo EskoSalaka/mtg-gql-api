@@ -119,20 +119,6 @@ const depthLimit = require('graphql-depth-limit');
         autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
         playground: config.get('APOLLO_PLAYGROUND'),
         validationRules: [depthLimit(config.get('APOLLO_DEPTH_LIMIT'))],
-        formatError: (error) => {
-          const originalError = error.extensions?.originalError as Error;
-
-          if (!originalError) {
-            return {
-              message: error.message,
-              code: error.extensions?.code,
-            };
-          }
-          return {
-            message: originalError.message,
-            code: error.extensions?.code,
-          };
-        },
       }),
       inject: [ConfigService],
     }),
