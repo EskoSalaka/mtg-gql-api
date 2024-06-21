@@ -3,6 +3,7 @@ import { UUIDResolver } from 'graphql-scalars';
 import { Column, DataType, DefaultScope, HasMany, Model, Table } from 'sequelize-typescript';
 import { Card } from 'src/modules/card/models/card.model';
 import SetType from '../types/set-type.type';
+import type { HasManyGetAssociationsMixin } from 'sequelize';
 
 export interface SetAttributes {
   id: string;
@@ -137,4 +138,6 @@ export class Set extends Model<SetAttributes, SetCreationAttributes> {
 
   @HasMany(() => Card)
   cards: Card[];
+
+  declare getCards: HasManyGetAssociationsMixin<Card>;
 }

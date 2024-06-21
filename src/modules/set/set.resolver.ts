@@ -6,6 +6,9 @@ import { WhereQueryArgs } from 'src/common/types/default-query-args.type';
 import { SetHeaderList } from './types/set-header-list.type';
 import { CardList } from './types/card-list.type';
 import { SetService } from './set.service';
+import { CardFace } from '../card/models/card-face.model';
+import { Ruling } from '../ruling/models/ruling.model';
+import { LatestPrice } from '../card/models/price.model';
 
 @Resolver(() => Set)
 export class SetResolver {
@@ -22,7 +25,7 @@ export class SetResolver {
   async sets(@Args() query: WhereQueryArgs, @Info() context: ExecutionContextHost) {
     let selectedFields = fieldsList(context, { path: 'rows', skip: ['rows.cards', 'total_rows'] });
 
-    let rows = await this.setService.findAll(query);
+    let rows = await this.setService.findAll(query, { setAttributes: selectedFields });
 
     return { rows, total_rows: rows.length };
   }
@@ -37,11 +40,26 @@ export class SetResolver {
     let rulingAttributes = fieldsList(context, { path: 'rows.rulings' });
     let priceAttributes = fieldsList(context, { path: 'rows.prices' });
 
-    let cards = await this.setService.cards(parent.id, {
-      cardAttributes,
-      cardFaceAttributes,
-      rulingAttributes,
-      priceAttributes,
+    let cards = await parent.getCards({
+      attributes: cardAttributes,
+      include: [
+        {
+          model: CardFace,
+          attributes: cardFaceAttributes,
+          duplicating: false,
+        },
+        {
+          model: Ruling,
+          attributes: rulingAttributes,
+          duplicating: false,
+        },
+        {
+          model: LatestPrice,
+          as: 'prices',
+          attributes: priceAttributes,
+          duplicating: false,
+        },
+      ],
     });
 
     return { rows: cards, total_rows: cards.length };
